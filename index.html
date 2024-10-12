@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Trance Pallete Generator v1</title>
+    <title>Trance Palette Generator v1</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile friendly -->
     <!-- Include Spectrum CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css">
@@ -121,7 +121,7 @@
         #exportLuaOutput {
             width: calc(100% - 1em);
             max-width: 1200px;
-            height: 150px;
+            height: 250px;
             margin: 0.5em auto;
             display: block;
             font-family: monospace;
@@ -187,7 +187,7 @@
                 padding: 0.5em 1em;
             }
             #exportLuaOutput {
-                height: 120px;
+                height: 200px;
                 margin: 0.25em auto;
             }
         }
@@ -195,7 +195,7 @@
 </head>
 <body>
 
-    <h1>Trance Pallete Generator v1</h1>
+    <h1>Trance Palette Generator v1.1</h1>
 
     <div id="colorContainer"></div>
 
@@ -638,8 +638,8 @@
         });
 
         // Function to convert the array-based color data to Lua table format
-        function convertToLuaTable(dataArray, indent = '') {
-            let lua = '{\n';
+        function convertToLuaTable(dataArray, indent = '', isRoot = true) {
+            let lua = isRoot ? '{\n' : '{\n';
             const indent2 = indent + '    ';
             dataArray.forEach(item => {
                 const key = item.key;
@@ -652,17 +652,19 @@
                 }
                 if (Array.isArray(value)) {
                     if (value.length > 0 && typeof value[0] === 'object') {
-                        lua += convertToLuaTable(value, indent2) + ',\n';
-                    } else {
+                        lua += convertToLuaTable(value, indent2, false) + ',\n';
+                    } else if (value.length > 0 && (typeof value[0] === 'string' || typeof value[0] === 'number')) {
                         // Array of colors
-                        lua += '{ ';
+                        lua += '{\n';
                         value.forEach(function(val) {
-                            lua += '"' + val + '", ';
+                            lua += indent2 + '    HEX(\'' + val + '\'),\n';
                         });
-                        lua += '},\n';
+                        lua += indent2 + '},\n';
+                    } else {
+                        lua += 'nil,\n';
                     }
                 } else if (typeof value === 'string') {
-                    lua += '"' + value + '",\n';
+                    lua += 'HEX(\'' + value + '\'),\n';
                 } else {
                     lua += 'nil,\n';
                 }
