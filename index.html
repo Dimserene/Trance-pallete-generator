@@ -2,214 +2,244 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Trance Palette Generator</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Include Spectrum color picker library -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.js"></script>
+    <title>Color Picker and Editor</title>
     <style>
-        /* General Styles */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            text-align: center;
-            padding: 10px;
-            margin: 0;
+            background-color: #f0f0f0;
         }
-        h1 {
-            margin-top: 20px;
-            font-size: 1.5em;
+        .category {
+            margin: 20px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
         }
-        .palette-group {
-            margin: 20px 0;
+        .category h2 {
+            margin-top: 0;
         }
-        .group-title {
-            font-size: 1.2em;
-            margin-bottom: 10px;
-            text-decoration: underline;
-        }
-        .palette-item {
+        .color-item {
             display: flex;
-            flex-wrap: nowrap;
-            justify-content: center;
             align-items: center;
-            margin: 10px 0;
+            margin-bottom: 10px;
         }
-        .palette-item > div, .palette-item > span {
-            margin: 5px;
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #cccccc;
+            margin-right: 10px;
         }
-        .subtitle {
-            font-weight: bold;
-            min-width: 80px;
+        .color-name {
+            width: 150px;
         }
-        .default-color, .new-color {
-            display: inline-block;
-            width: 100px;
-            padding: 10px;
-            color: #fff;
-            font-weight: bold;
-            border-radius: 5px;
-            text-align: center;
-            cursor: pointer;
+        .color-picker {
+            margin-left: auto;
         }
-        button {
-            margin-top: 20px;
-            padding: 15px 25px;
-            font-size: 1em;
-            cursor: pointer;
-            border: none;
-            background-color: #374244;
-            color: #fff;
-            border-radius: 5px;
+        #exportButton {
+            margin: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
         }
-        button:hover {
-            background-color: #4f6367;
-        }
-        /* Responsive adjustments */
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 1.2em;
-            }
-            .subtitle, .default-color, .new-color {
-                width: 80px;
-                font-size: 0.9em;
-                padding: 8px;
-            }
-            .palette-item {
-                flex-wrap: wrap;
-            }
-            button {
-                padding: 12px 20px;
-                font-size: 0.9em;
-            }
+        #exportOutput {
+            width: 100%;
+            height: 200px;
+            margin: 20px;
+            font-family: monospace;
         }
     </style>
 </head>
 <body>
-    <h1>Trance Palette Generator</h1>
 
-    <div id="palette-container">
-        <!-- Main Colors -->
-        <div class="palette-group">
-            <div class="group-title">Main Colors</div>
-            <!-- SPLASH -->
-            <div class="palette-item">
-                <div class="subtitle">SPLASH</div>
-                <span class="default-color" style="background-color: #FE5F55;">#FE5F55</span>
-                <span class="new-color" id="SPLASH" style="background-color: #FE5F55;">#FE5F55</span>
-            </div>
-            <!-- MULT -->
-            <div class="palette-item">
-                <div class="subtitle">MULT</div>
-                <span class="default-color" style="background-color: #FE5F55;">#FE5F55</span>
-                <span class="new-color" id="MULT" style="background-color: #FE5F55;">#FE5F55</span>
-            </div>
-            <!-- CHIPS -->
-            <div class="palette-item">
-                <div class="subtitle">CHIPS</div>
-                <span class="default-color" style="background-color: #009DFF;">#009DFF</span>
-                <span class="new-color" id="CHIPS" style="background-color: #009DFF;">#009DFF</span>
-            </div>
-            <!-- PLASMA -->
-            <div class="palette-item">
-                <div class="subtitle">PLASMA</div>
-                <span class="default-color" style="background-color: #CC73D9;">#CC73D9</span>
-                <span class="new-color" id="PLASMA" style="background-color: #CC73D9;">#CC73D9</span>
-            </div>
-            <!-- MONEY -->
-            <div class="palette-item">
-                <div class="subtitle">MONEY</div>
-                <span class="default-color" style="background-color: #F3B958;">#F3B958</span>
-                <span class="new-color" id="MONEY" style="background-color: #F3B958;">#F3B958</span>
-            </div>
-            <!-- Continue adding other main colors similarly -->
-        </div>
+    <h1>Color Picker and Editor</h1>
 
-        <!-- UI Colors -->
-        <div class="palette-group">
-            <div class="group-title">UI Colors</div>
-            <!-- TEXT_LIGHT -->
-            <div class="palette-item">
-                <div class="subtitle">TEXT_LIGHT</div>
-                <span class="default-color" style="background-color: #FFFFFF;">#FFFFFF</span>
-                <span class="new-color" id="UI_TEXT_LIGHT" style="background-color: #FFFFFF;">#FFFFFF</span>
-            </div>
-            <!-- TEXT_DARK -->
-            <div class="palette-item">
-                <div class="subtitle">TEXT_DARK</div>
-                <span class="default-color" style="background-color: #4F6367;">#4F6367</span>
-                <span class="new-color" id="UI_TEXT_DARK" style="background-color: #4F6367;">#4F6367</span>
-            </div>
-            <!-- Continue with other UI colors... -->
-        </div>
+    <div id="colorContainer"></div>
 
-        <!-- BOSSES Colors -->
-        <div class="palette-group">
-            <div class="group-title">Bosses Colors</div>
-            <!-- bl_ox -->
-            <div class="palette-item">
-                <div class="subtitle">bl_ox</div>
-                <span class="default-color" style="background-color: #B95B08;">#B95B08</span>
-                <span class="new-color" id="BOSSES_bl_ox" style="background-color: #B95B08;">#B95B08</span>
-            </div>
-            <!-- Add other BOSSES colors similarly -->
-        </div>
-
-        <!-- SET Colors -->
-        <div class="palette-group">
-            <div class="group-title">Set Colors</div>
-            <!-- Default -->
-            <div class="palette-item">
-                <div class="subtitle">Default</div>
-                <span class="default-color" style="background-color: #CDD9DC;">#CDD9DC</span>
-                <span class="new-color" id="SET_Default" style="background-color: #CDD9DC;">#CDD9DC</span>
-            </div>
-            <!-- Add other SET colors similarly -->
-        </div>
-
-        <!-- Continue adding groups for other categories like SECONDARY_SET, RARITY, SO_1, SO_2, etc. -->
-
-    </div>
-
-    <!-- Button to Export the Palette -->
-    <button onclick="exportPalette()">Export Palette</button>
+    <button id="exportButton">Export Updated Colors</button>
+    <textarea id="exportOutput" placeholder="Updated colors will appear here..."></textarea>
 
     <script>
-        // Initialize Spectrum Color Pickers for each new-color span
-        function initializeSpectrum() {
-            document.querySelectorAll('.new-color').forEach(function(el) {
-                $(el).spectrum({
-                    color: el.style.backgroundColor,
-                    showInput: true,
-                    showInitial: true,
-                    preferredFormat: "hex",
-                    change: function(color) {
-                        updateColor(el, color.toHexString());
-                    }
-                });
-            });
+        // Original color data
+        const colorData = {
+            SPLASH: ['FE5F55', '009DFF'],
+            MULT: 'FE5F55',
+            CHIPS: '009dff',
+            PLASMA: 'cc73d9',
+            MONEY: 'f3b958',
+            XMULT: 'FE5F55',
+            FILTER: 'ff9a00',
+            BLUE: '009dff',
+            RED: 'FE5F55',
+            GREEN: '4BC292',
+            PALE_GREEN: '56a887',
+            ORANGE: 'fda200',
+            IMPORTANT: 'ff9a00',
+            GOLD: 'eac058',
+            YELLOW: 'ffff00',
+            CLEAR: '00000000',
+            WHITE: 'ffffff',
+            PURPLE: '8867a5',
+            BLACK: '374244',
+            L_BLACK: '4f6367',
+            GREY: '5f7377',
+            CHANCE: '4BC292',
+            JOKER_GREY: 'bfc7d5',
+            VOUCHER: 'cb724c',
+            BOOSTER: '646eb7',
+            ETERNAL: 'c75985',
+            PERISHABLE: '4f5da1',
+            RENTAL: 'b18f43',
+            DYN_UI: {
+                MAIN: '374244',
+                DARK: '374244',
+                BOSS_MAIN: '374244',
+                BOSS_DARK: '374244',
+                BOSS_PALE: '374244'
+            },
+            SO_1: {
+                Hearts: 'f03464',
+                Diamonds: 'f06b3f',
+                Spades: '403995',
+                Clubs: '235955'
+            },
+            SO_2: {
+                Hearts: 'f83b2f',
+                Diamonds: 'e29000',
+                Spades: '4f31b9',
+                Clubs: '008ee6'
+            },
+            UI: {
+                TEXT_LIGHT: 'ffffff',
+                TEXT_DARK: '4F6367',
+                TEXT_INACTIVE: '88888899',
+                BACKGROUND_LIGHT: 'B8D8D8',
+                BACKGROUND_WHITE: 'ffffff',
+                BACKGROUND_DARK: '7A9E9F',
+                BACKGROUND_INACTIVE: '666666FF',
+                OUTLINE_LIGHT: 'D8D8D8',
+                OUTLINE_LIGHT_TRANS: 'D8D8D866',
+                OUTLINE_DARK: '7A9E9F',
+                TRANSPARENT_LIGHT: 'eeeeee22',
+                TRANSPARENT_DARK: '22222222',
+                HOVER: '00000055'
+            },
+            SET: {
+                Default: 'cdd9dc',
+                Enhanced: 'cdd9dc',
+                Joker: '424e54',
+                Tarot: '424e54',
+                Planet: '424e54',
+                Spectral: '424e54',
+                Voucher: '424e54'
+            },
+            SECONDARY_SET: {
+                Default: '9bb6bdFF',
+                Enhanced: '8389DDFF',
+                Joker: '708b91',
+                Tarot: 'a782d1',
+                Planet: '13afce',
+                Spectral: '4584fa',
+                Voucher: 'fd682b',
+                Edition: '4ca893'
+            },
+            RARITY: ['009dff', '4BC292', 'fe5f55', 'b26cbb'],
+            BLIND: {
+                Small: '50846e',
+                Big: '50846e',
+                Boss: 'b44430',
+                won: '4f6367'
+            },
+            HAND_LEVELS: ['efefef', '95acff', '65efaf', 'fae37e', 'ffc052', 'f87d75', 'caa0ef'],
+            BACKGROUND: {
+                L: 'ffff00',
+                D: '374244',
+                C: '374244'
+            },
+            BOSSES: {
+                bl_ox: 'b95b08',
+                bl_hook: 'a84024',
+                bl_mouth: 'ae718e',
+                bl_fish: '3e85bd',
+                bl_club: 'b9cb92',
+                bl_manacle: '575757',
+                bl_tooth: 'b52d2d',
+                bl_wall: '8a59a5',
+                bl_house: '5186a8',
+                bl_mark: '6a3847',
+                bl_wheel: '50bf7c',
+                bl_arm: '6865f3',
+                bl_psychic: 'efc03c',
+                bl_goad: 'b95c96',
+                bl_water: 'c6e0eb',
+                bl_eye: '4b71e4',
+                bl_plant: '709284',
+                bl_needle: '5c6e31',
+                bl_head: 'ac9db4',
+                bl_window: 'a9a295',
+                bl_serpent: '439a4f',
+                bl_pillar: '7e6752',
+                bl_flint: 'e56a2f',
+                bl_final_bell: '009cfd',
+                bl_final_leaf: '56a786',
+                bl_final_vessel: '8a71e1',
+                bl_final_acorn: 'fda200',
+                bl_final_heart: 'ac3232'
+            }
+        };
+
+        // Function to create color pickers
+        function createColorPickers(data, container, categoryName) {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'category';
+
+            if (categoryName) {
+                const categoryTitle = document.createElement('h2');
+                categoryTitle.textContent = categoryName;
+                categoryDiv.appendChild(categoryTitle);
+            }
+
+            for (const key in data) {
+                if (typeof data[key] === 'object' && !Array.isArray(data[key])) {
+                    createColorPickers(data[key], categoryDiv, key);
+                } else {
+                    const colorItem = document.createElement('div');
+                    colorItem.className = 'color-item';
+
+                    const colorSwatch = document.createElement('div');
+                    colorSwatch.className = 'color-swatch';
+                    colorSwatch.style.backgroundColor = '#' + data[key];
+
+                    const colorName = document.createElement('div');
+                    colorName.className = 'color-name';
+                    colorName.textContent = key;
+
+                    const colorInput = document.createElement('input');
+                    colorInput.type = 'color';
+                    colorInput.value = '#' + data[key].slice(0, 6);
+                    colorInput.className = 'color-picker';
+                    colorInput.addEventListener('input', function() {
+                        colorSwatch.style.backgroundColor = colorInput.value;
+                        data[key] = colorInput.value.slice(1) + data[key].slice(6);
+                    });
+
+                    colorItem.appendChild(colorSwatch);
+                    colorItem.appendChild(colorName);
+                    colorItem.appendChild(colorInput);
+
+                    categoryDiv.appendChild(colorItem);
+                }
+            }
+
+            container.appendChild(categoryDiv);
         }
 
-        // Function to update the new color and background
-        function updateColor(element, colorValue) {
-            element.style.backgroundColor = colorValue;
-            element.textContent = colorValue.toUpperCase();
-            element.style.color = getContrastingColor(colorValue);
-        }
+        // Initialize the color pickers
+        const colorContainer = document.getElementById('colorContainer');
+        createColorPickers(colorData, colorContainer);
 
-        // Function to get contrasting text color (black or white)
-        function getContrastingColor(hexColor) {
-            const r = parseInt(hexColor.substr(1,2),16);
-            const g = parseInt(hexColor.substr(3,2),16);
-            const b = parseInt(hexColor.substr(5,2),16);
-            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-            return brightness > 125 ? '#000' : '#fff';
-        }
-
-        // Function to export the palette as a Lua file
-        function exportPalette() {
-            const palette = {
-                SPLASH: document.getElementById('SPLASH').style.backgroundColor,
-                MULT: document.getElementById('MULT').style.backgroundColor,
-                CHIPS: document.getElementById('CHIPS').style.backgroundColor,
-                PLASMA
+        // Export functionality
+        document.getElementById('exportButton').addEventListener('click', function() {
+            const exportedData = JSON.stringify(colorData, null, 4);
+            document.getElementById('exportOutput').value = exportedData;
+        });
+    </script>
+</body>
+</html>
