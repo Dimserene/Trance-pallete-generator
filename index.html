@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Color Picker and Editor with Updated Reset Icon</title>
+    <title>Color Picker and Editor with Reset All and Lua Export</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile friendly -->
     <!-- Include Spectrum CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css">
@@ -36,13 +36,16 @@
             border-radius: 4px;
             box-sizing: border-box;
             padding: 0.5em;
+            display: block; /* Ensure block display */
         }
         .category h2 {
-            margin: 0 0 0.5em 0;
+            margin: 1em 0 0.5em 0;
             font-size: 1.2em;
             text-align: left;
             border-bottom: 1px solid #ccc;
             padding-bottom: 0.25em;
+            display: block; /* Ensure block display */
+            width: 100%; /* Ensure it takes full width */
         }
         .color-grid {
             display: grid;
@@ -98,7 +101,7 @@
             padding: 0;
             margin-right: 0.25em;
         }
-        #exportButton,
+        #resetAllButton,
         #exportLuaButton {
             display: inline-block;
             margin: 0.5em;
@@ -110,15 +113,14 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        #exportButton:hover,
+        #resetAllButton:hover,
         #exportLuaButton:hover {
             background-color: #4f6367;
         }
-        #exportOutput,
         #exportLuaOutput {
             width: calc(100% - 1em);
             max-width: 1200px;
-            height: 150px;
+            height: 200px;
             margin: 0.5em auto;
             display: block;
             font-family: monospace;
@@ -132,11 +134,14 @@
         @media (max-width: 600px) {
             .category {
                 padding: 0.25em;
+                display: block; /* Ensure block display */
             }
             .category h2 {
                 font-size: 1em;
-                margin-bottom: 0.25em;
+                margin: 1em 0 0.25em 0; /* Add top margin */
                 padding-bottom: 0.25em;
+                display: block; /* Ensure block display */
+                width: 100%; /* Ensure it takes full width */
             }
             .color-grid {
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -173,14 +178,13 @@
             .hex-input {
                 margin-bottom: 0;
             }
-            #exportButton,
+            #resetAllButton,
             #exportLuaButton {
                 margin: 0.25em;
                 padding: 0.5em 1em;
             }
-            #exportOutput,
             #exportLuaOutput {
-                height: 120px;
+                height: 150px;
                 margin: 0.25em auto;
             }
         }
@@ -193,11 +197,10 @@
     <div id="colorContainer"></div>
 
     <div style="text-align: center;">
-        <button id="exportButton">Export Updated Colors</button>
-        <button id="exportLuaButton">Export to Lua File</button>
+        <button id="resetAllButton">Reset All</button>
+        <button id="exportLuaButton">Export</button>
     </div>
-    <textarea id="exportOutput" placeholder="Updated colors in JSON will appear here..."></textarea>
-    <textarea id="exportLuaOutput" placeholder="Updated colors in Lua format will appear here..."></textarea>
+    <textarea id="exportLuaOutput" placeholder="Exported colors in Lua format will appear here..."></textarea>
 
     <!-- Include jQuery (Spectrum dependency) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -405,15 +408,7 @@
             resetButton.className = 'reset-button';
             resetButton.title = 'Reset to Default';
             resetButton.addEventListener('click', function() {
-                // Reset data
-                parentData[dataKey] = defaultColorValue;
-                // Update Spectrum color picker
-                const defaultHexColor = defaultColorValue.slice(0, 6).toUpperCase();
-                const defaultAlpha = defaultColorValue.length >= 8 ? parseInt(defaultColorValue.slice(6, 8), 16) / 255 : 1;
-                const defaultColorString = '#' + defaultHexColor + (defaultAlpha < 1 ? defaultColorValue.slice(6, 8) : '');
-                $(colorInput).spectrum("set", defaultColorString);
-                // Update hex input
-                hexInput.value = defaultColorValue.toUpperCase();
+                resetColor(parentData, dataKey, defaultColorValue, colorInput, hexInput);
             });
 
             // Append elements
@@ -474,21 +469,48 @@
             });
         }
 
+        function resetColor(parentData, dataKey, defaultColorValue, colorInput, hexInput) {
+            // Reset data
+            parentData[dataKey] = defaultColorValue;
+            // Update Spectrum color picker
+            const defaultHexColor = defaultColorValue.slice(0, 6).toUpperCase();
+            const defaultAlpha = defaultColorValue.length >= 8 ? parseInt(defaultColorValue.slice(6, 8), 16) / 255 : 1;
+            const defaultColorString = '#' + defaultHexColor + (defaultAlpha < 1 ? defaultColorValue.slice(6, 8) : '');
+            $(colorInput).spectrum("set", defaultColorString);
+            // Update hex input
+            hexInput.value = defaultColorValue.toUpperCase();
+        }
+
         // Initialize the color pickers
         const colorContainer = document.getElementById('colorContainer');
         createColorPickers(colorData, colorContainer, null, defaultColorData);
-
-        // Export functionality
-        document.getElementById('exportButton').addEventListener('click', function() {
-            const exportedData = JSON.stringify(colorData, null, 4);
-            document.getElementById('exportOutput').value = exportedData;
-        });
 
         // Export to Lua functionality
         document.getElementById('exportLuaButton').addEventListener('click', function() {
             const exportedLua = convertToLuaTable(colorData);
             document.getElementById('exportLuaOutput').value = exportedLua;
         });
+
+        // Reset All functionality
+        document.getElementById('resetAllButton').addEventListener('click', function() {
+            if (confirm('Are you sure you want to reset all colors to their default values?')) {
+                resetAllColors();
+            }
+        });
+
+        function resetAllColors() {
+            // Deep copy defaultColorData into colorData
+            Object.keys(defaultColorData).forEach(key => {
+                if (typeof defaultColorData[key] === 'object' && !Array.isArray(defaultColorData[key])) {
+                    colorData[key] = JSON.parse(JSON.stringify(defaultColorData[key]));
+                } else {
+                    colorData[key] = defaultColorData[key];
+                }
+            });
+            // Reinitialize the color pickers
+            colorContainer.innerHTML = '';
+            createColorPickers(colorData, colorContainer, null, defaultColorData);
+        }
 
         // Function to convert JSON object to Lua table format
         function convertToLuaTable(obj, indent = '') {
@@ -524,9 +546,4 @@
                     lua += 'nil,\n';
                 }
             }
-            lua += indent + '}';
-            return lua;
-        }
-    </script>
-</body>
-</html>
+            lua += indent
