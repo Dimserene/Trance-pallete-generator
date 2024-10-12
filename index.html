@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Trance Palette Generator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Include jscolor library -->
+    <script src="https://jscolor.com/releases/2.4.5/jscolor.js"></script>
     <style>
         /* General Styles */
         body {
@@ -27,7 +29,7 @@
         }
         .palette-item {
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             justify-content: center;
             align-items: center;
             margin: 10px 0;
@@ -41,17 +43,25 @@
         }
         .default-color, .new-color {
             display: inline-block;
-            min-width: 80px;
+            width: 100px;
             padding: 10px;
             color: #fff;
             font-weight: bold;
             border-radius: 5px;
+            text-align: center;
         }
-        .palette-item input[type="color"] {
-            width: 50px;
-            height: 50px;
-            padding: 0;
+        .palette-item input[type="text"] {
+            width: 100px;
+            padding: 10px;
             border: none;
+            text-align: center;
+            font-weight: bold;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .palette-item input[type="text"].jscolor {
+            padding: 0;
             background: none;
         }
         button {
@@ -72,14 +82,13 @@
             h1 {
                 font-size: 1.2em;
             }
-            .subtitle, .default-color, .new-color {
-                min-width: 70px;
+            .subtitle, .default-color, .new-color, .palette-item input[type="text"] {
+                width: 80px;
                 font-size: 0.9em;
                 padding: 8px;
             }
-            .palette-item input[type="color"] {
-                width: 40px;
-                height: 40px;
+            .palette-item {
+                flex-wrap: wrap;
             }
             button {
                 padding: 12px 20px;
@@ -95,32 +104,25 @@
         <!-- Main Colors -->
         <div class="palette-group">
             <div class="group-title">Main Colors</div>
-            <!-- SPLASH_1 -->
+            <!-- SPLASH -->
             <div class="palette-item">
-                <div class="subtitle">SPLASH_1</div>
+                <div class="subtitle">SPLASH</div>
                 <span class="default-color" style="background-color: #FE5F55;">#FE5F55</span>
-                <input type="color" id="SPLASH_1" value="#FE5F55" onchange="updateColor(this.id)">
-                <span class="new-color" id="new-SPLASH_1" style="background-color: #FE5F55;">#FE5F55</span>
-            </div>
-            <!-- SPLASH_2 -->
-            <div class="palette-item">
-                <div class="subtitle">SPLASH_2</div>
-                <span class="default-color" style="background-color: #009DFF;">#009DFF</span>
-                <input type="color" id="SPLASH_2" value="#009DFF" onchange="updateColor(this.id)">
-                <span class="new-color" id="new-SPLASH_2" style="background-color: #009DFF;">#009DFF</span>
+                <input class="jscolor {onFineChange:'updateColor(this)'}" id="SPLASH" value="FE5F55">
+                <span class="new-color" id="new-SPLASH" style="background-color: #FE5F55;">#FE5F55</span>
             </div>
             <!-- MULT -->
             <div class="palette-item">
                 <div class="subtitle">MULT</div>
                 <span class="default-color" style="background-color: #FE5F55;">#FE5F55</span>
-                <input type="color" id="MULT" value="#FE5F55" onchange="updateColor(this.id)">
+                <input class="jscolor {onFineChange:'updateColor(this)'}" id="MULT" value="FE5F55">
                 <span class="new-color" id="new-MULT" style="background-color: #FE5F55;">#FE5F55</span>
             </div>
             <!-- CHIPS -->
             <div class="palette-item">
                 <div class="subtitle">CHIPS</div>
                 <span class="default-color" style="background-color: #009DFF;">#009DFF</span>
-                <input type="color" id="CHIPS" value="#009DFF" onchange="updateColor(this.id)">
+                <input class="jscolor {onFineChange:'updateColor(this)'}" id="CHIPS" value="009DFF">
                 <span class="new-color" id="new-CHIPS" style="background-color: #009DFF;">#009DFF</span>
             </div>
             <!-- Continue with other main colors... -->
@@ -128,31 +130,17 @@
             <div class="palette-item">
                 <div class="subtitle">PLASMA</div>
                 <span class="default-color" style="background-color: #CC73D9;">#CC73D9</span>
-                <input type="color" id="PLASMA" value="#CC73D9" onchange="updateColor(this.id)">
+                <input class="jscolor {onFineChange:'updateColor(this)'}" id="PLASMA" value="CC73D9">
                 <span class="new-color" id="new-PLASMA" style="background-color: #CC73D9;">#CC73D9</span>
             </div>
             <!-- MONEY -->
             <div class="palette-item">
                 <div class="subtitle">MONEY</div>
                 <span class="default-color" style="background-color: #F3B958;">#F3B958</span>
-                <input type="color" id="MONEY" value="#F3B958" onchange="updateColor(this.id)">
+                <input class="jscolor {onFineChange:'updateColor(this)'}" id="MONEY" value="F3B958">
                 <span class="new-color" id="new-MONEY" style="background-color: #F3B958;">#F3B958</span>
             </div>
-            <!-- XMULT -->
-            <div class="palette-item">
-                <div class="subtitle">XMULT</div>
-                <span class="default-color" style="background-color: #FE5F55;">#FE5F55</span>
-                <input type="color" id="XMULT" value="#FE5F55" onchange="updateColor(this.id)">
-                <span class="new-color" id="new-XMULT" style="background-color: #FE5F55;">#FE5F55</span>
-            </div>
-            <!-- FILTER -->
-            <div class="palette-item">
-                <div class="subtitle">FILTER</div>
-                <span class="default-color" style="background-color: #FF9A00;">#FF9A00</span>
-                <input type="color" id="FILTER" value="#FF9A00" onchange="updateColor(this.id)">
-                <span class="new-color" id="new-FILTER" style="background-color: #FF9A00;">#FF9A00</span>
-            </div>
-            <!-- Add other main colors similarly -->
+            <!-- Continue adding other colors similarly -->
         </div>
 
         <!-- UI Colors -->
@@ -160,63 +148,23 @@
             <div class="group-title">UI Colors</div>
             <!-- UI_TEXT_LIGHT -->
             <div class="palette-item">
-                <div class="subtitle">UI_TEXT_LIGHT</div>
+                <div class="subtitle">TEXT_LIGHT</div>
                 <span class="default-color" style="background-color: #FFFFFF;">#FFFFFF</span>
-                <input type="color" id="UI_TEXT_LIGHT" value="#FFFFFF" onchange="updateColor(this.id)">
+                <input class="jscolor {onFineChange:'updateColor(this)'}" id="UI_TEXT_LIGHT" value="FFFFFF">
                 <span class="new-color" id="new-UI_TEXT_LIGHT" style="background-color: #FFFFFF;">#FFFFFF</span>
             </div>
             <!-- UI_TEXT_DARK -->
             <div class="palette-item">
-                <div class="subtitle">UI_TEXT_DARK</div>
+                <div class="subtitle">TEXT_DARK</div>
                 <span class="default-color" style="background-color: #4F6367;">#4F6367</span>
-                <input type="color" id="UI_TEXT_DARK" value="#4F6367" onchange="updateColor(this.id)">
+                <input class="jscolor {onFineChange:'updateColor(this)'}" id="UI_TEXT_DARK" value="4F6367">
                 <span class="new-color" id="new-UI_TEXT_DARK" style="background-color: #4F6367;">#4F6367</span>
             </div>
             <!-- Continue with other UI colors... -->
-            <!-- UI_BACKGROUND_LIGHT -->
-            <div class="palette-item">
-                <div class="subtitle">UI_BG_LIGHT</div>
-                <span class="default-color" style="background-color: #B8D8D8;">#B8D8D8</span>
-                <input type="color" id="UI_BACKGROUND_LIGHT" value="#B8D8D8" onchange="updateColor(this.id)">
-                <span class="new-color" id="new-UI_BACKGROUND_LIGHT" style="background-color: #B8D8D8;">#B8D8D8</span>
-            </div>
-            <!-- Add other UI colors similarly -->
         </div>
 
-        <!-- BOSSES Colors -->
-        <div class="palette-group">
-            <div class="group-title">Bosses Colors</div>
-            <!-- BOSSES_bl_ox -->
-            <div class="palette-item">
-                <div class="subtitle">bl_ox</div>
-                <span class="default-color" style="background-color: #B95B08;">#B95B08</span>
-                <input type="color" id="BOSSES_bl_ox" value="#B95B08" onchange="updateColor(this.id)">
-                <span class="new-color" id="new-BOSSES_bl_ox" style="background-color: #B95B08;">#B95B08</span>
-            </div>
-            <!-- BOSSES_bl_hook -->
-            <div class="palette-item">
-                <div class="subtitle">bl_hook</div>
-                <span class="default-color" style="background-color: #A84024;">#A84024</span>
-                <input type="color" id="BOSSES_bl_hook" value="#A84024" onchange="updateColor(this.id)">
-                <span class="new-color" id="new-BOSSES_bl_hook" style="background-color: #A84024;">#A84024</span>
-            </div>
-            <!-- Add other BOSSES colors similarly -->
-        </div>
+        <!-- Continue adding groups for other categories like SET, BOSSES, etc. -->
 
-        <!-- Continue adding groups for other categories like SET, SECONDARY_SET, SO_1, SO_2, etc. -->
-
-        <!-- Example for SET Colors -->
-        <div class="palette-group">
-            <div class="group-title">Set Colors</div>
-            <!-- SET_Default -->
-            <div class="palette-item">
-                <div class="subtitle">Default</div>
-                <span class="default-color" style="background-color: #CDD9DC;">#CDD9DC</span>
-                <input type="color" id="SET_Default" value="#CDD9DC" onchange="updateColor(this.id)">
-                <span class="new-color" id="new-SET_Default" style="background-color: #CDD9DC;">#CDD9DC</span>
-            </div>
-            <!-- Add other SET colors similarly -->
-        </div>
     </div>
 
     <!-- Button to Export the Palette -->
@@ -224,57 +172,47 @@
 
     <script>
         // Function to update the new color and background
-        function updateColor(colorId) {
-            const colorPicker = document.getElementById(colorId);
+        function updateColor(picker) {
+            const colorId = picker.id;
             const newColorSpan = document.getElementById('new-' + colorId);
-            newColorSpan.style.backgroundColor = colorPicker.value;
-            newColorSpan.textContent = colorPicker.value.toUpperCase();
+            const colorValue = '#' + picker.value.toUpperCase();
+            newColorSpan.style.backgroundColor = colorValue;
+            newColorSpan.textContent = colorValue;
+            picker.style.backgroundColor = colorValue;
+            picker.style.color = getContrastingColor(colorValue);
+        }
+
+        // Function to get contrasting text color (black or white)
+        function getContrastingColor(hexColor) {
+            const r = parseInt(hexColor.substr(1,2),16);
+            const g = parseInt(hexColor.substr(3,2),16);
+            const b = parseInt(hexColor.substr(5,2),16);
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            return brightness > 125 ? '#000' : '#fff';
         }
 
         // Function to export the palette as a Lua file
         function exportPalette() {
             const colorIds = [
                 // Main Colors
-                'SPLASH_1', 'SPLASH_2', 'MULT', 'CHIPS', 'PLASMA', 'MONEY', 'XMULT', 'FILTER', 'BLUE', 'RED', 'GREEN',
+                'SPLASH', 'MULT', 'CHIPS', 'PLASMA', 'MONEY', 'XMULT', 'FILTER', 'BLUE', 'RED', 'GREEN',
                 'PALE_GREEN', 'ORANGE', 'IMPORTANT', 'GOLD', 'YELLOW', 'CLEAR', 'WHITE', 'PURPLE', 'BLACK', 'L_BLACK',
                 'GREY', 'CHANCE', 'JOKER_GREY', 'VOUCHER', 'BOOSTER', 'ETERNAL', 'PERISHABLE', 'RENTAL',
-                // DYN_UI Colors
-                'DYN_UI_MAIN', 'DYN_UI_DARK', 'DYN_UI_BOSS_MAIN', 'DYN_UI_BOSS_DARK', 'DYN_UI_BOSS_PALE',
-                // SO_1 Colors
-                'SO_1_Hearts', 'SO_1_Diamonds', 'SO_1_Spades', 'SO_1_Clubs',
-                // SO_2 Colors
-                'SO_2_Hearts', 'SO_2_Diamonds', 'SO_2_Spades', 'SO_2_Clubs',
                 // UI Colors
                 'UI_TEXT_LIGHT', 'UI_TEXT_DARK', 'UI_TEXT_INACTIVE', 'UI_BACKGROUND_LIGHT', 'UI_BACKGROUND_WHITE',
                 'UI_BACKGROUND_DARK', 'UI_BACKGROUND_INACTIVE', 'UI_OUTLINE_LIGHT', 'UI_OUTLINE_LIGHT_TRANS',
                 'UI_OUTLINE_DARK', 'UI_TRANSPARENT_LIGHT', 'UI_TRANSPARENT_DARK', 'UI_HOVER',
-                // SET Colors
-                'SET_Default', 'SET_Enhanced', 'SET_Joker', 'SET_Tarot', 'SET_Planet', 'SET_Spectral', 'SET_Voucher',
-                // SECONDARY_SET Colors
-                'SECONDARY_SET_Default', 'SECONDARY_SET_Enhanced', 'SECONDARY_SET_Joker', 'SECONDARY_SET_Tarot',
-                'SECONDARY_SET_Planet', 'SECONDARY_SET_Spectral', 'SECONDARY_SET_Voucher', 'SECONDARY_SET_Edition',
-                // RARITY Colors
-                'RARITY_1', 'RARITY_2', 'RARITY_3', 'RARITY_4',
-                // BLIND Colors
-                'BLIND_Small', 'BLIND_Big', 'BLIND_Boss', 'BLIND_won',
-                // HAND_LEVELS Colors
-                'HAND_LEVELS_1', 'HAND_LEVELS_2', 'HAND_LEVELS_3', 'HAND_LEVELS_4', 'HAND_LEVELS_5', 'HAND_LEVELS_6', 'HAND_LEVELS_7',
-                // BACKGROUND Colors
-                'BACKGROUND_L', 'BACKGROUND_D', 'BACKGROUND_C',
-                // BOSSES Colors
-                'BOSSES_bl_ox', 'BOSSES_bl_hook', 'BOSSES_bl_mouth', 'BOSSES_bl_fish', 'BOSSES_bl_club', 'BOSSES_bl_manacle',
-                'BOSSES_bl_tooth', 'BOSSES_bl_wall', 'BOSSES_bl_house', 'BOSSES_bl_mark', 'BOSSES_bl_wheel', 'BOSSES_bl_arm',
-                'BOSSES_bl_psychic', 'BOSSES_bl_goad', 'BOSSES_bl_water', 'BOSSES_bl_eye', 'BOSSES_bl_plant', 'BOSSES_bl_needle',
-                'BOSSES_bl_head', 'BOSSES_bl_window', 'BOSSES_bl_serpent', 'BOSSES_bl_pillar', 'BOSSES_bl_flint',
-                'BOSSES_bl_final_bell', 'BOSSES_bl_final_leaf', 'BOSSES_bl_final_vessel', 'BOSSES_bl_final_acorn', 'BOSSES_bl_final_heart'
+                // Add other color IDs here
             ];
 
             let luaScript = "return {\n";
 
             colorIds.forEach(id => {
-                const colorValue = document.getElementById(id).value.toUpperCase().slice(1);
-                const luaKey = id.replace(/_/g, '.').replace(/\./, ' = {\n    ').replace(/\./g, ' = HEX(\'') + '\')';
-                luaScript += `    ${luaKey},\n`;
+                const picker = document.getElementById(id);
+                if (picker) {
+                    const colorValue = picker.value.toUpperCase();
+                    luaScript += `    ${id} = HEX('${colorValue}'),\n`;
+                }
             });
 
             luaScript += "}";
