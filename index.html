@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Color Picker and Editor with Single-Line Mobile Layout</title>
+    <title>Color Picker and Editor with Reset and Lua Export</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile friendly -->
     <!-- Include Spectrum CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css">
@@ -88,9 +88,20 @@
             border-radius: 2px;
             text-transform: uppercase;
         }
-        #exportButton {
-            display: block;
-            margin: 0.5em auto;
+        .reset-button {
+            width: 1.2em;
+            height: 1.2em;
+            background: url('https://endlessicons.com/wp-content/uploads/2012/11/reset-icon-614x460.png') no-repeat center;
+            background-size: contain;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin-right: 0.25em;
+        }
+        #exportButton,
+        #exportLuaButton {
+            display: inline-block;
+            margin: 0.5em;
             padding: 0.5em 1em;
             font-size: 1em;
             background-color: #374244;
@@ -99,10 +110,12 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        #exportButton:hover {
+        #exportButton:hover,
+        #exportLuaButton:hover {
             background-color: #4f6367;
         }
-        #exportOutput {
+        #exportOutput,
+        #exportLuaOutput {
             width: calc(100% - 1em);
             max-width: 1200px;
             height: 150px;
@@ -145,8 +158,10 @@
             }
             .color-original,
             .arrow,
-            .color-picker {
+            .color-picker,
+            .reset-button {
                 width: 1em;
+                height: 1em;
             }
             .hex-input {
                 width: 4em;
@@ -158,11 +173,13 @@
             .hex-input {
                 margin-bottom: 0;
             }
-            #exportButton {
-                margin: 0.25em auto;
+            #exportButton,
+            #exportLuaButton {
+                margin: 0.25em;
                 padding: 0.5em 1em;
             }
-            #exportOutput {
+            #exportOutput,
+            #exportLuaOutput {
                 height: 120px;
                 margin: 0.25em auto;
             }
@@ -175,17 +192,21 @@
 
     <div id="colorContainer"></div>
 
-    <button id="exportButton">Export Updated Colors</button>
-    <textarea id="exportOutput" placeholder="Updated colors will appear here..."></textarea>
+    <div style="text-align: center;">
+        <button id="exportButton">Export Updated Colors</button>
+        <button id="exportLuaButton">Export to Lua File</button>
+    </div>
+    <textarea id="exportOutput" placeholder="Updated colors in JSON will appear here..."></textarea>
+    <textarea id="exportLuaOutput" placeholder="Updated colors in Lua format will appear here..."></textarea>
 
     <!-- Include jQuery (Spectrum dependency) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Include Spectrum JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.js"></script>
     <script>
-        // Original color data
-        const colorData = {
-                        SPLASH: ['FE5F55', '009DFF'],
+        // Original color data (deep copy to preserve defaults)
+        const defaultColorData = {
+            SPLASH: ['FE5F55', '009DFF'],
             MULT: 'FE5F55',
             CHIPS: '009dff',
             PLASMA: 'cc73d9',
@@ -311,8 +332,11 @@
             }
         };
 
+        // Copy of color data that will be modified
+        const colorData = JSON.parse(JSON.stringify(defaultColorData));
+
         // Function to create color pickers using Spectrum
-        function createColorPickers(data, container, categoryName) {
+        function createColorPickers(data, container, categoryName, defaultData) {
             const categoryDiv = document.createElement('div');
             categoryDiv.className = 'category';
 
@@ -327,13 +351,13 @@
 
             for (const key in data) {
                 if (typeof data[key] === 'object' && !Array.isArray(data[key])) {
-                    createColorPickers(data[key], categoryDiv, key);
+                    createColorPickers(data[key], categoryDiv, key, defaultData[key]);
                 } else if (Array.isArray(data[key])) {
                     data[key].forEach((item, index) => {
-                        createColorItem(item, `${key}[${index}]`, data[key], index, colorGrid);
+                        createColorItem(item, `${key}[${index}]`, data[key], index, colorGrid, defaultData[key]);
                     });
                 } else {
-                    createColorItem(data[key], key, data, key, colorGrid);
+                    createColorItem(data[key], key, data, key, colorGrid, defaultData);
                 }
             }
 
@@ -341,7 +365,9 @@
             container.appendChild(categoryDiv);
         }
 
-        function createColorItem(colorValue, displayName, parentData, dataKey, container) {
+        function createColorItem(colorValue, displayName, parentData, dataKey, container, defaultParentData) {
+            const defaultColorValue = Array.isArray(defaultParentData) ? defaultParentData[dataKey] : defaultParentData[dataKey];
+
             const colorItem = document.createElement('div');
             colorItem.className = 'color-item';
 
@@ -351,7 +377,7 @@
 
             const colorOriginal = document.createElement('div');
             colorOriginal.className = 'color-original';
-            colorOriginal.style.backgroundColor = '#' + colorValue.slice(0, 6);
+            colorOriginal.style.backgroundColor = '#' + defaultColorValue.slice(0, 6);
 
             const arrow = document.createElement('div');
             arrow.className = 'arrow';
@@ -374,6 +400,22 @@
             hexInput.className = 'hex-input';
             hexInput.maxLength = 8;
 
+            // Reset Button
+            const resetButton = document.createElement('button');
+            resetButton.className = 'reset-button';
+            resetButton.title = 'Reset to Default';
+            resetButton.addEventListener('click', function() {
+                // Reset data
+                parentData[dataKey] = defaultColorValue;
+                // Update Spectrum color picker
+                const defaultHexColor = defaultColorValue.slice(0, 6).toUpperCase();
+                const defaultAlpha = defaultColorValue.length >= 8 ? parseInt(defaultColorValue.slice(6, 8), 16) / 255 : 1;
+                const defaultColorString = '#' + defaultHexColor + (defaultAlpha < 1 ? defaultColorValue.slice(6, 8) : '');
+                $(colorInput).spectrum("set", defaultColorString);
+                // Update hex input
+                hexInput.value = defaultColorValue.toUpperCase();
+            });
+
             // Append elements
             colorItem.appendChild(colorName);
 
@@ -384,6 +426,7 @@
             controlsContainer.appendChild(arrow);
             controlsContainer.appendChild(colorInput);
             controlsContainer.appendChild(hexInput);
+            controlsContainer.appendChild(resetButton);
 
             colorItem.appendChild(controlsContainer);
             container.appendChild(colorItem);
@@ -433,13 +476,57 @@
 
         // Initialize the color pickers
         const colorContainer = document.getElementById('colorContainer');
-        createColorPickers(colorData, colorContainer);
+        createColorPickers(colorData, colorContainer, null, defaultColorData);
 
         // Export functionality
         document.getElementById('exportButton').addEventListener('click', function() {
             const exportedData = JSON.stringify(colorData, null, 4);
             document.getElementById('exportOutput').value = exportedData;
         });
+
+        // Export to Lua functionality
+        document.getElementById('exportLuaButton').addEventListener('click', function() {
+            const exportedLua = convertToLuaTable(colorData);
+            document.getElementById('exportLuaOutput').value = exportedLua;
+        });
+
+        // Function to convert JSON object to Lua table format
+        function convertToLuaTable(obj, indent = '') {
+            let lua = '{\n';
+            const indent2 = indent + '    ';
+            for (const key in obj) {
+                const value = obj[key];
+                lua += indent2;
+                if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(key)) {
+                    lua += key + ' = ';
+                } else {
+                    lua += '["' + key + '"] = ';
+                }
+                if (typeof value === 'string') {
+                    lua += '"' + value + '",\n';
+                } else if (typeof value === 'number') {
+                    lua += value + ',\n';
+                } else if (typeof value === 'boolean') {
+                    lua += (value ? 'true' : 'false') + ',\n';
+                } else if (Array.isArray(value)) {
+                    lua += '{ ';
+                    value.forEach(function(item) {
+                        if (typeof item === 'string') {
+                            lua += '"' + item + '", ';
+                        } else {
+                            lua += item + ', ';
+                        }
+                    });
+                    lua += '},\n';
+                } else if (typeof value === 'object') {
+                    lua += convertToLuaTable(value, indent2) + ',\n';
+                } else {
+                    lua += 'nil,\n';
+                }
+            }
+            lua += indent + '}';
+            return lua;
+        }
     </script>
 </body>
 </html>
