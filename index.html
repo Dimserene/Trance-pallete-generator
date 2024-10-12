@@ -120,7 +120,7 @@
         #exportLuaOutput {
             width: calc(100% - 1em);
             max-width: 1200px;
-            height: 200px;
+            height: 150px;
             margin: 0.5em auto;
             display: block;
             font-family: monospace;
@@ -184,7 +184,7 @@
                 padding: 0.5em 1em;
             }
             #exportLuaOutput {
-                height: 150px;
+                height: 120px;
                 margin: 0.25em auto;
             }
         }
@@ -200,7 +200,7 @@
         <button id="resetAllButton">Reset All</button>
         <button id="exportLuaButton">Export</button>
     </div>
-    <textarea id="exportLuaOutput" placeholder="Exported colors in Lua format will appear here..."></textarea>
+    <textarea id="exportLuaOutput" placeholder="Updated colors in Lua format will appear here..."></textarea>
 
     <!-- Include jQuery (Spectrum dependency) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -336,7 +336,10 @@
         };
 
         // Copy of color data that will be modified
-        const colorData = JSON.parse(JSON.stringify(defaultColorData));
+        let colorData = JSON.parse(JSON.stringify(defaultColorData));
+
+        // Store references to Spectrum instances
+        const spectrumInstances = [];
 
         // Function to create color pickers using Spectrum
         function createColorPickers(data, container, categoryName, defaultData) {
@@ -408,7 +411,15 @@
             resetButton.className = 'reset-button';
             resetButton.title = 'Reset to Default';
             resetButton.addEventListener('click', function() {
-                resetColor(parentData, dataKey, defaultColorValue, colorInput, hexInput);
+                // Reset data
+                parentData[dataKey] = defaultColorValue;
+                // Update Spectrum color picker
+                const defaultHexColor = defaultColorValue.slice(0, 6).toUpperCase();
+                const defaultAlpha = defaultColorValue.length >= 8 ? parseInt(defaultColorValue.slice(6, 8), 16) / 255 : 1;
+                const defaultColorString = '#' + defaultHexColor + (defaultAlpha < 1 ? defaultColorValue.slice(6, 8) : '');
+                $(colorInput).spectrum("set", defaultColorString);
+                // Update hex input
+                hexInput.value = defaultColorValue.toUpperCase();
             });
 
             // Append elements
@@ -427,7 +438,7 @@
             container.appendChild(colorItem);
 
             // Initialize Spectrum on the colorInput
-            $(colorInput).spectrum({
+            const spectrumInstance = $(colorInput).spectrum({
                 color: '#' + hexColor + (alpha < 1 ? Math.round(alpha * 255).toString(16).padStart(2, '0') : ''),
                 showInput: false,
                 showInitial: false,
@@ -442,6 +453,16 @@
                     hexInput.value = newHex8.slice(1);
                     parentData[dataKey] = newHex8.slice(1);
                 }
+            });
+
+            // Store reference for reset all functionality
+            spectrumInstances.push({
+                spectrumInstance: spectrumInstance,
+                colorInput: colorInput,
+                hexInput: hexInput,
+                parentData: parentData,
+                dataKey: dataKey,
+                defaultColorValue: defaultColorValue
             });
 
             // Update functions
@@ -469,48 +490,36 @@
             });
         }
 
-        function resetColor(parentData, dataKey, defaultColorValue, colorInput, hexInput) {
-            // Reset data
-            parentData[dataKey] = defaultColorValue;
-            // Update Spectrum color picker
-            const defaultHexColor = defaultColorValue.slice(0, 6).toUpperCase();
-            const defaultAlpha = defaultColorValue.length >= 8 ? parseInt(defaultColorValue.slice(6, 8), 16) / 255 : 1;
-            const defaultColorString = '#' + defaultHexColor + (defaultAlpha < 1 ? defaultColorValue.slice(6, 8) : '');
-            $(colorInput).spectrum("set", defaultColorString);
-            // Update hex input
-            hexInput.value = defaultColorValue.toUpperCase();
-        }
-
         // Initialize the color pickers
         const colorContainer = document.getElementById('colorContainer');
         createColorPickers(colorData, colorContainer, null, defaultColorData);
 
-        // Export to Lua functionality
-        document.getElementById('exportLuaButton').addEventListener('click', function() {
-            const exportedLua = convertToLuaTable(colorData);
-            document.getElementById('exportLuaOutput').value = exportedLua;
-        });
-
         // Reset All functionality
         document.getElementById('resetAllButton').addEventListener('click', function() {
-            if (confirm('Are you sure you want to reset all colors to their default values?')) {
-                resetAllColors();
+            if (confirm('Are you sure you want to reset all colors to their default values? This action cannot be undone.')) {
+                // Reset colorData to defaultColorData
+                colorData = JSON.parse(JSON.stringify(defaultColorData));
+
+                // Update all Spectrum instances and hex inputs
+                spectrumInstances.forEach(function(item) {
+                    // Update parent data
+                    item.parentData[item.dataKey] = item.defaultColorValue;
+                    // Update Spectrum color picker
+                    const defaultHexColor = item.defaultColorValue.slice(0, 6).toUpperCase();
+                    const defaultAlpha = item.defaultColorValue.length >= 8 ? parseInt(item.defaultColorValue.slice(6, 8), 16) / 255 : 1;
+                    const defaultColorString = '#' + defaultHexColor + (defaultAlpha < 1 ? item.defaultColorValue.slice(6, 8) : '');
+                    $(item.colorInput).spectrum("set", defaultColorString);
+                    // Update hex input
+                    item.hexInput.value = item.defaultColorValue.toUpperCase();
+                });
             }
         });
 
-        function resetAllColors() {
-            // Deep copy defaultColorData into colorData
-            Object.keys(defaultColorData).forEach(key => {
-                if (typeof defaultColorData[key] === 'object' && !Array.isArray(defaultColorData[key])) {
-                    colorData[key] = JSON.parse(JSON.stringify(defaultColorData[key]));
-                } else {
-                    colorData[key] = defaultColorData[key];
-                }
-            });
-            // Reinitialize the color pickers
-            colorContainer.innerHTML = '';
-            createColorPickers(colorData, colorContainer, null, defaultColorData);
-        }
+        // Export to Lua functionality
+        document.getElementById('exportLuaButton').addEventListener('click', function() {
+            const exportedLua = 'return ' + convertToLuaTable(colorData);
+            document.getElementById('exportLuaOutput').value = exportedLua;
+        });
 
         // Function to convert JSON object to Lua table format
         function convertToLuaTable(obj, indent = '') {
@@ -529,21 +538,4 @@
                 } else if (typeof value === 'number') {
                     lua += value + ',\n';
                 } else if (typeof value === 'boolean') {
-                    lua += (value ? 'true' : 'false') + ',\n';
-                } else if (Array.isArray(value)) {
-                    lua += '{ ';
-                    value.forEach(function(item) {
-                        if (typeof item === 'string') {
-                            lua += '"' + item + '", ';
-                        } else {
-                            lua += item + ', ';
-                        }
-                    });
-                    lua += '},\n';
-                } else if (typeof value === 'object') {
-                    lua += convertToLuaTable(value, indent2) + ',\n';
-                } else {
-                    lua += 'nil,\n';
-                }
-            }
-            lua += indent
+                    lua += (value 
