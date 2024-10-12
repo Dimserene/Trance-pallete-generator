@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trance Palette Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .section h2 {
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .palette-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .palette-item > div {
+            margin-right: 10px;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            width: 200px;
+            font-weight: bold;
+        }
+        .color-box {
+            padding: 5px 10px;
+            color: #fff;
+            font-weight: bold;
+            border-radius: 4px;
+            min-width: 100px;
+            text-align: center;
+            margin-right: 10px;
+        }
+        .color-input {
+            margin-right: 10px;
+        }
+        .buttons {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .buttons button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+        }
+        .download-btn {
+            background-color: #28a745;
+        }
+        .reset-btn {
+            background-color: #dc3545;
+        }
+        @media (max-width: 600px) {
+            .palette-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .subtitle, .color-box, .color-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Trance Palette Generator</h1>
+
+    <div id="palette-container"></div>
+
+    <div class="buttons">
+        <button class="download-btn" onclick="downloadLua()">Download Lua Palette</button>
+        <button class="reset-btn" onclick="resetColors()">Reset to Default</button>
+    </div>
+
+    <script>
+        // Define the default palette
+        const defaultPalette = {
+            SPLASH: ['FE5F55', '009DFF'],
+            MULT: 'FE5F55',
+            CHIPS: '009dff',
+            PLASMA: 'cc73d9',
+            MONEY: 'f3b958',
+            XMULT: 'FE5F55',
+            FILTER: 'ff9a00',
+            BLUE: '009dff',
+            RED: 'FE5F55',
+            GREEN: '4BC292',
+            PALE_GREEN: '56a887',
+            ORANGE: 'fda200',
+            IMPORTANT: 'ff9a00',
+            GOLD: 'eac058',
+            YELLOW: 'ffff00',
+            CLEAR: '00000000',
+            WHITE: 'ffffff',
+            PURPLE: '8867a5',
+            BLACK: '374244',
+            L_BLACK: '4f6367',
+            GREY: '5f7377',
+            CHANCE: '4BC292',
+            JOKER_GREY: 'bfc7d5',
+            VOUCHER: 'cb724c',
+            BOOSTER: '646eb7',
+            ETERNAL: 'c75985',
+            PERISHABLE: '4f5da1',
+            RENTAL: 'b18f43',
+            DYN_UI: {
+                MAIN: '374244',
+                DARK: '374244',
+                BOSS_MAIN: '374244',
+                BOSS_DARK: '374244',
+                BOSS_PALE: '374244'
+            },
+            SO_1: {
+                Hearts: 'f03464',
+                Diamonds: 'f06b3f',
+                Spades: '403995',
+                Clubs: '235955'
+            },
+            SO_2: {
+                Hearts: 'f83b2f',
+                Diamonds: 'e29000',
+                Spades: '4f31b9',
+                Clubs: '008ee6'
+            },
+            UI: {
+                TEXT_LIGHT: 'ffffff',
+                TEXT_DARK: '4F6367',
+                TEXT_INACTIVE: '88888899',
+                BACKGROUND_LIGHT: 'B8D8D8',
+                BACKGROUND_WHITE: 'ffffff',
+                BACKGROUND_DARK: '7A9E9F',
+                BACKGROUND_INACTIVE: '666666FF',
+                OUTLINE_LIGHT: 'D8D8D8',
+                OUTLINE_LIGHT_TRANS: 'D8D8D866',
+                OUTLINE_DARK: '7A9E9F',
+                TRANSPARENT_LIGHT: 'eeeeee22',
+                TRANSPARENT_DARK: '22222222',
+                HOVER: '00000055'
+            },
+            SET: {
+                Default: 'cdd9dc',
+                Enhanced: 'cdd9dc',
+                Joker: '424e54',
+                Tarot: '424e54',
+                Planet: '424e54',
+                Spectral: '424e54',
+                Voucher: '424e54'
+            },
+            SECONDARY_SET: {
+                Default: '9bb6bdFF',
+                Enhanced: '8389DDFF',
+                Joker: '708b91',
+                Tarot: 'a782d1',
+                Planet: '13afce',
+                Spectral: '4584fa',
+                Voucher: 'fd682b',
+                Edition: '4ca893'
+            },
+            RARITY: ['009dff', '4BC292', 'fe5f55', 'b26cbb'],
+            BLIND: {
+                Small: '50846e',
+                Big: '50846e',
+                Boss: 'b44430',
+                won: '4f6367'
+            },
+            HAND_LEVELS: ['efefef', '95acff', '65efaf', 'fae37e', 'ffc052', 'f87d75', 'caa0ef'],
+            BACKGROUND: {
+                L: 'ffff00',
+                D: '374244',
+                C: '374244'
+            },
+            BOSSES: {
+                bl_ox: 'b95b08',
+                bl_hook: 'a84024',
+                bl_mouth: 'ae718e',
+                bl_fish: '3e85bd',
+                bl_club: 'b9cb92',
+                bl_manacle: '575757',
+                bl_tooth: 'b52d2d',
+                bl_wall: '8a59a5',
+                bl_house: '5186a8',
+                bl_mark: '6a3847',
+                bl_wheel: '50bf7c',
+                bl_arm: '6865f3',
+                bl_psychic: 'efc03c',
+                bl_goad: 'b95c96',
+                bl_water: 'c6e0eb',
+                bl_eye: '4b71e4',
+                bl_plant: '709284',
+                bl_needle: '5c6e31',
+                bl_head: 'ac9db4',
+                bl_window: 'a9a295',
+                bl_serpent: '439a4f',
+                bl_pillar: '7e6752',
+                bl_flint: 'e56a2f',
+                bl_final_bell: '009cfd',
+                bl_final_leaf: '56a786',
+                bl_final_vessel: '8a71e1',
+                bl_final_acorn: 'fda200',
+                bl_final_heart: 'ac3232'
+            }
+        };
+
+        // Deep copy of defaultPalette to currentPalette
+        let currentPalette = JSON.parse(JSON.stringify(defaultPalette));
+
+        // Function to create palette items
+        function createPaletteItem(key, value, parentKey = '') {
+            const container = document.createElement('div');
+            container.className = 'palette-item';
+
+            const subtitle = document.createElement('div');
+            subtitle.className = 'subtitle';
+            subtitle.textContent = parentKey ? `${parentKey} -> ${key}` : key;
+            container.appendChild(subtitle);
+
+            if (typeof value === 'object' && !Array.isArray(value)) {
+                // Nested object
+                const nestedContainer = document.createElement('div');
+                nestedContainer.style.marginLeft = '20px';
+                for (const nestedKey in value) {
+                    const nestedItem = createPaletteItem(nestedKey, value[nestedKey], parentKey ? `${parentKey} -> ${key}` : key);
+                    nestedContainer.appendChild(nestedItem);
+                }
+                container.appendChild(nestedContainer);
+            } else if (Array.isArray(value)) {
+                // Array of colors
+                value.forEach((color, index) => {
+                    const colorContainer = document.createElement('div');
+                    colorContainer.className = 'palette-item';
+
+                    const defaultSpan = document.createElement('span');
+                    defaultSpan.className = 'color-box';
+                    defaultSpan.style.backgroundColor = `#${color}`;
+                    defaultSpan.textContent = `#${color.toUpperCase()}`;
+                    colorContainer.appendChild(defaultSpan);
+
+                    const colorInput = document.createElement('input');
+                    colorInput.type = 'color';
+                    colorInput.className = 'color-input';
+                    colorInput.value = `#${color}`;
+                    colorInput.onchange = () => {
+                        currentPalette[key][index] = colorInput.value.substring(1);
+                        defaultSpan.style.backgroundColor = colorInput.value;
+                        defaultSpan.textContent = colorInput.value.toUpperCase();
+                    };
+                    colorContainer.appendChild(colorInput);
+
+                    const newSpan = document.createElement('span');
+                    newSpan.className = 'color-box';
+                    newSpan.style.backgroundColor = `#${color}`;
+                    newSpan.textContent = `#${color.toUpperCase()}`;
+                    colorContainer.appendChild(newSpan);
+
+                    container.appendChild(colorContainer);
+                });
+            } else {
+                // Single color
+                const defaultSpan = document.createElement('span');
+                defaultSpan.className = 'color-box';
+                defaultSpan.style.backgroundColor = `#${value}`;
+                defaultSpan.textContent = `#${value.toUpperCase()}`;
+                container.appendChild(defaultSpan);
+
+                const colorInput = document.createElement('input');
+                colorInput.type = 'color';
+                colorInput.className = 'color-input';
+                colorInput.value = `#${value}`;
+                colorInput.onchange = () => {
+                    currentPalette[key] = colorInput.value.substring(1);
+                    defaultSpan.style.backgroundColor = colorInput.value;
+                    defaultSpan.textContent = colorInput.value.toUpperCase();
+                };
+                container.appendChild(colorInput);
+
+                const newSpan = document.createElement('span');
+                newSpan.className = 'color-box';
+                newSpan.style.backgroundColor = `#${value}`;
+                newSpan.textContent = `#${value.toUpperCase()}`;
+                container.appendChild(newSpan);
+            }
+
+            return container;
+        }
+
+        // Function to render the palette
+        function renderPalette() {
+            const container = document.getElementById('palette-container');
+            container.innerHTML = '';
+
+            for (const key in currentPalette) {
+                const item = createPaletteItem(key, currentPalette[key]);
+                container.appendChild(item);
+            }
+        }
+
+        // Function to convert JavaScript object to Lua table
+        function toLuaTable(obj, indent = 0) {
+            const luaIndent = '    '.repeat(indent);
+            let lua = '{\n';
+            for (const key in obj) {
+                const value = obj[key];
+                if (typeof value === 'object' && !Array.isArray(value)) {
+                    lua += `${luaIndent}    ${key} = ${toLuaTable(value, indent + 1)},\n`;
+                } else if (Array.isArray(value)) {
+                    lua += `${luaIndent}    ${key} = {\n`;
+                    value.forEach(item => {
+                        lua += `${luaIndent}        HEX('${item.toUpperCase()}'),\n`;
+                    });
+                    lua += `${luaIndent}    },\n`;
+                } else {
+                    lua += `${luaIndent}    ${key} = HEX('${value.toUpperCase()}'),\n`;
+                }
+            }
+            lua += `${luaIndent}}`;
+            return lua;
+        }
+
+        // Function to download Lua script
+        function downloadLua() {
+            const luaContent = `return ${toLuaTable(currentPalette)}`;
+            const blob = new Blob([luaContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'TrancePalette.lua';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Function to reset colors to default
+        function resetColors() {
+            currentPalette = JSON.parse(JSON.stringify(defaultPalette));
+            renderPalette();
+        }
+
+        // Initial render
+        renderPalette();
+    </script>
+
+</body>
+</html>
