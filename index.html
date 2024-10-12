@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <title>Trance Palette Generator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Include jscolor library -->
-    <script src="https://jscolor.com/releases/2.4.5/jscolor.js"></script>
+    <!-- Include Spectrum color picker library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.js"></script>
     <style>
         /* General Styles */
         body {
@@ -34,7 +35,7 @@
             align-items: center;
             margin: 10px 0;
         }
-        .palette-item > div, .palette-item > span, .palette-item > input {
+        .palette-item > div, .palette-item > span {
             margin: 5px;
         }
         .subtitle {
@@ -50,20 +51,6 @@
             border-radius: 5px;
             text-align: center;
             cursor: pointer;
-        }
-        .palette-item input[type="text"] {
-            width: 100px;
-            padding: 10px;
-            border: none;
-            text-align: center;
-            font-weight: bold;
-            color: #fff;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .palette-item input[type="text"].jscolor {
-            padding: 0;
-            background: none;
         }
         button {
             margin-top: 20px;
@@ -83,7 +70,7 @@
             h1 {
                 font-size: 1.2em;
             }
-            .subtitle, .default-color, .new-color, .palette-item input[type="text"] {
+            .subtitle, .default-color, .new-color {
                 width: 80px;
                 font-size: 0.9em;
                 padding: 8px;
@@ -109,31 +96,31 @@
             <div class="palette-item">
                 <div class="subtitle">SPLASH</div>
                 <span class="default-color" style="background-color: #FE5F55;">#FE5F55</span>
-                <span class="new-color jscolor" data-jscolor="{onFineChange:'updateColor(this)', valueElement: 'SPLASH'}" style="background-color: #FE5F55;">#FE5F55</span>
+                <span class="new-color" id="SPLASH" style="background-color: #FE5F55;">#FE5F55</span>
             </div>
             <!-- MULT -->
             <div class="palette-item">
                 <div class="subtitle">MULT</div>
                 <span class="default-color" style="background-color: #FE5F55;">#FE5F55</span>
-                <span class="new-color jscolor" data-jscolor="{onFineChange:'updateColor(this)', valueElement: 'MULT'}" style="background-color: #FE5F55;">#FE5F55</span>
+                <span class="new-color" id="MULT" style="background-color: #FE5F55;">#FE5F55</span>
             </div>
             <!-- CHIPS -->
             <div class="palette-item">
                 <div class="subtitle">CHIPS</div>
                 <span class="default-color" style="background-color: #009DFF;">#009DFF</span>
-                <span class="new-color jscolor" data-jscolor="{onFineChange:'updateColor(this)', valueElement: 'CHIPS'}" style="background-color: #009DFF;">#009DFF</span>
+                <span class="new-color" id="CHIPS" style="background-color: #009DFF;">#009DFF</span>
             </div>
             <!-- PLASMA -->
             <div class="palette-item">
                 <div class="subtitle">PLASMA</div>
                 <span class="default-color" style="background-color: #CC73D9;">#CC73D9</span>
-                <span class="new-color jscolor" data-jscolor="{onFineChange:'updateColor(this)', valueElement: 'PLASMA'}" style="background-color: #CC73D9;">#CC73D9</span>
+                <span class="new-color" id="PLASMA" style="background-color: #CC73D9;">#CC73D9</span>
             </div>
             <!-- MONEY -->
             <div class="palette-item">
                 <div class="subtitle">MONEY</div>
                 <span class="default-color" style="background-color: #F3B958;">#F3B958</span>
-                <span class="new-color jscolor" data-jscolor="{onFineChange:'updateColor(this)', valueElement: 'MONEY'}" style="background-color: #F3B958;">#F3B958</span>
+                <span class="new-color" id="MONEY" style="background-color: #F3B958;">#F3B958</span>
             </div>
             <!-- Continue adding other main colors similarly -->
         </div>
@@ -145,13 +132,13 @@
             <div class="palette-item">
                 <div class="subtitle">TEXT_LIGHT</div>
                 <span class="default-color" style="background-color: #FFFFFF;">#FFFFFF</span>
-                <span class="new-color jscolor" data-jscolor="{onFineChange:'updateColor(this)', valueElement: 'UI_TEXT_LIGHT'}" style="background-color: #FFFFFF;">#FFFFFF</span>
+                <span class="new-color" id="UI_TEXT_LIGHT" style="background-color: #FFFFFF;">#FFFFFF</span>
             </div>
             <!-- TEXT_DARK -->
             <div class="palette-item">
                 <div class="subtitle">TEXT_DARK</div>
                 <span class="default-color" style="background-color: #4F6367;">#4F6367</span>
-                <span class="new-color jscolor" data-jscolor="{onFineChange:'updateColor(this)', valueElement: 'UI_TEXT_DARK'}" style="background-color: #4F6367;">#4F6367</span>
+                <span class="new-color" id="UI_TEXT_DARK" style="background-color: #4F6367;">#4F6367</span>
             </div>
             <!-- Continue with other UI colors... -->
         </div>
@@ -163,7 +150,7 @@
             <div class="palette-item">
                 <div class="subtitle">bl_ox</div>
                 <span class="default-color" style="background-color: #B95B08;">#B95B08</span>
-                <span class="new-color jscolor" data-jscolor="{onFineChange:'updateColor(this)', valueElement: 'BOSSES_bl_ox'}" style="background-color: #B95B08;">#B95B08</span>
+                <span class="new-color" id="BOSSES_bl_ox" style="background-color: #B95B08;">#B95B08</span>
             </div>
             <!-- Add other BOSSES colors similarly -->
         </div>
@@ -175,7 +162,7 @@
             <div class="palette-item">
                 <div class="subtitle">Default</div>
                 <span class="default-color" style="background-color: #CDD9DC;">#CDD9DC</span>
-                <span class="new-color jscolor" data-jscolor="{onFineChange:'updateColor(this)', valueElement: 'SET_Default'}" style="background-color: #CDD9DC;">#CDD9DC</span>
+                <span class="new-color" id="SET_Default" style="background-color: #CDD9DC;">#CDD9DC</span>
             </div>
             <!-- Add other SET colors similarly -->
         </div>
@@ -188,15 +175,26 @@
     <button onclick="exportPalette()">Export Palette</button>
 
     <script>
+        // Initialize Spectrum Color Pickers for each new-color span
+        function initializeSpectrum() {
+            document.querySelectorAll('.new-color').forEach(function(el) {
+                $(el).spectrum({
+                    color: el.style.backgroundColor,
+                    showInput: true,
+                    showInitial: true,
+                    preferredFormat: "hex",
+                    change: function(color) {
+                        updateColor(el, color.toHexString());
+                    }
+                });
+            });
+        }
+
         // Function to update the new color and background
-        function updateColor(picker) {
-            const colorId = picker.valueElement;
-            const newColorSpan = picker;
-            const colorValue = '#' + picker.jscolor.toHEXString().toUpperCase();
-            newColorSpan.style.backgroundColor = colorValue;
-            newColorSpan.textContent = colorValue;
-            picker.style.backgroundColor = colorValue;
-            picker.style.color = getContrastingColor(colorValue);
+        function updateColor(element, colorValue) {
+            element.style.backgroundColor = colorValue;
+            element.textContent = colorValue.toUpperCase();
+            element.style.color = getContrastingColor(colorValue);
         }
 
         // Function to get contrasting text color (black or white)
@@ -210,22 +208,21 @@
 
         // Function to export the palette as a Lua file
         function exportPalette() {
-            // Build the palette object with nested structure
             const palette = {
-                SPLASH: document.querySelector('.new-color[data-jscolor*="SPLASH"]').jscolor.toHEXString().toUpperCase(),
-                MULT: document.querySelector('.new-color[data-jscolor*="MULT"]').jscolor.toHEXString().toUpperCase(),
-                CHIPS: document.querySelector('.new-color[data-jscolor*="CHIPS"]').jscolor.toHEXString().toUpperCase(),
-                PLASMA: document.querySelector('.new-color[data-jscolor*="PLASMA"]').jscolor.toHEXString().toUpperCase(),
-                MONEY: document.querySelector('.new-color[data-jscolor*="MONEY"]').jscolor.toHEXString().toUpperCase(),
+                SPLASH: document.getElementById('SPLASH').style.backgroundColor,
+                MULT: document.getElementById('MULT').style.backgroundColor,
+                CHIPS: document.getElementById('CHIPS').style.backgroundColor,
+                PLASMA: document.getElementById('PLASMA').style.backgroundColor,
+                MONEY: document.getElementById('MONEY').style.backgroundColor,
                 UI: {
-                    TEXT_LIGHT: document.querySelector('.new-color[data-jscolor*="UI_TEXT_LIGHT"]').jscolor.toHEXString().toUpperCase(),
-                    TEXT_DARK: document.querySelector('.new-color[data-jscolor*="UI_TEXT_DARK"]').jscolor.toHEXString().toUpperCase(),
+                    TEXT_LIGHT: document.getElementById('UI_TEXT_LIGHT').style.backgroundColor,
+                    TEXT_DARK: document.getElementById('UI_TEXT_DARK').style.backgroundColor,
                 },
                 BOSSES: {
-                    bl_ox: document.querySelector('.new-color[data-jscolor*="BOSSES_bl_ox"]').jscolor.toHEXString().toUpperCase(),
+                    bl_ox: document.getElementById('BOSSES_bl_ox').style.backgroundColor,
                 },
                 SET: {
-                    Default: document.querySelector('.new-color[data-jscolor*="SET_Default"]').jscolor.toHEXString().toUpperCase(),
+                    Default: document.getElementById('SET_Default').style.backgroundColor,
                 },
                 // Add other groups similarly...
             };
@@ -241,14 +238,22 @@
                         if (typeof obj[key] === 'object') {
                             lua += toLuaTable(obj[key], indent + 1);
                         } else {
-                            lua += `HEX('${obj[key]}'),\n`;
+                            lua += `HEX('${rgbToHex(obj[key])}'),\n`;
                         }
                     }
                     lua += `${indentation.slice(4)}}`;
                 } else {
-                    lua += `HEX('${obj}')`;
+                    lua += `HEX('${rgbToHex(obj)}')`;
                 }
                 return lua;
+            }
+
+            // Helper function to convert RGB to Hex
+            function rgbToHex(rgb) {
+                const result = /^rgb(\d+),\s*(\d+),\s*(\d+)$/.exec(rgb);
+                return result
+                    ? "#" + (1 << 24 | (+result[1] << 16) | (+result[2] << 8) | +result[3]).toString(16).slice(1).toUpperCase()
+                    : rgb;
             }
 
             let luaScript = 'return ' + toLuaTable(palette, 0);
@@ -262,6 +267,9 @@
             link.click();
             document.body.removeChild(link);
         }
+
+        // Initialize Spectrum color pickers on page load
+        document.addEventListener('DOMContentLoaded', initializeSpectrum);
     </script>
 </body>
 </html>
