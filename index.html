@@ -2,9 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Color Picker and Editor</title>
+    <title>Color Picker and Editor with Spectrum</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile friendly -->
+    <!-- Include Spectrum CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css">
     <style>
+        /* Include your CSS styles here */
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
@@ -145,6 +148,10 @@
     <button id="exportButton">Export Updated Colors</button>
     <textarea id="exportOutput" placeholder="Updated colors will appear here..."></textarea>
 
+    <!-- Include jQuery (Spectrum dependency) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Spectrum JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.js"></script>
     <script>
         // Original color data
         const colorData = {
@@ -274,7 +281,7 @@
             }
         };
 
-        // Function to create color pickers
+        // Function to create color pickers using Spectrum
         function createColorPickers(data, container, categoryName) {
             const categoryDiv = document.createElement('div');
             categoryDiv.className = 'category';
@@ -320,10 +327,13 @@
             arrow.className = 'arrow';
             arrow.textContent = '→';
 
+            // Create an input for Spectrum
             const colorInput = document.createElement('input');
-            colorInput.type = 'color';
-            colorInput.value = '#' + colorValue.slice(0, 6);
+            colorInput.type = 'text';
             colorInput.className = 'color-picker';
+
+            // Set initial value
+            colorInput.value = '#' + colorValue.slice(0, 6);
 
             const hexInput = document.createElement('input');
             hexInput.type = 'text';
@@ -331,32 +341,7 @@
             hexInput.className = 'hex-input';
             hexInput.maxLength = 6;
 
-            // Update functions
-            function updateColor(newColor) {
-                if (/^[0-9A-Fa-f]{6}$/.test(newColor)) {
-                    colorInput.value = '#' + newColor;
-                    parentData[dataKey] = newColor + colorValue.slice(6);
-                }
-            }
-
-            colorInput.addEventListener('input', function() {
-                const newHex = colorInput.value.slice(1).toUpperCase();
-                hexInput.value = newHex;
-                parentData[dataKey] = newHex + colorValue.slice(6);
-            });
-
-            hexInput.addEventListener('input', function() {
-                const newHex = hexInput.value.toUpperCase();
-                updateColor(newHex);
-            });
-
-            hexInput.addEventListener('blur', function() {
-                // Validate hex code on blur
-                if (!/^[0-9A-Fa-f]{6}$/.test(hexInput.value)) {
-                    hexInput.value = parentData[dataKey].slice(0,6).toUpperCase();
-                }
-            });
-
+            // Append elements
             colorItem.appendChild(colorName);
             colorItem.appendChild(colorOriginal);
             colorItem.appendChild(arrow);
@@ -364,6 +349,47 @@
             colorItem.appendChild(hexInput);
 
             container.appendChild(colorItem);
+
+            // Initialize Spectrum on the colorInput
+            $(colorInput).spectrum({
+                color: colorInput.value,
+                showInput: false,
+                showInitial: false,
+                preferredFormat: "hex",
+                change: function(tinycolor) {
+                    const newHex = tinycolor.toHexString().toUpperCase();
+                    hexInput.value = newHex.slice(1);
+                    parentData[dataKey] = newHex.slice(1) + colorValue.slice(6);
+                },
+                move: function(tinycolor) {
+                    // Optional: update hexInput while moving the selector
+                    const newHex = tinycolor.toHexString().toUpperCase();
+                    hexInput.value = newHex.slice(1);
+                }
+            });
+
+            // Update functions
+            function updateColor(newColor) {
+                if (/^[0-9A-Fa-f]{6}$/.test(newColor)) {
+                    $(colorInput).spectrum("set", '#' + newColor);
+                    parentData[dataKey] = newColor + colorValue.slice(6);
+                }
+            }
+
+            hexInput.addEventListener('input', function() {
+                const newHex = hexInput.value.toUpperCase();
+                if (/^[0-9A-Fa-f]{6}$/.test(newHex)) {
+                    updateColor(newHex);
+                }
+            });
+
+            hexInput.addEventListener('blur', function() {
+                // Validate hex code on blur
+                if (!/^[0-9A-Fa-f]{6}$/.test(hexInput.value)) {
+                    const currentHex = parentData[dataKey].slice(0,6).toUpperCase();
+                    hexInput.value = currentHex;
+                }
+            });
         }
 
         // Initialize the color pickers
