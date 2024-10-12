@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Color Picker and Editor with Compact Mobile Layout</title>
+    <title>Color Picker and Editor with Single-Line Mobile Layout</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile friendly -->
     <!-- Include Spectrum CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css">
     <style>
-        /* CSS Styles */
+        /* Base CSS Styles */
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
@@ -55,33 +55,30 @@
             padding: 0.25em;
             background-color: #f9f9f9;
             border-radius: 4px;
+            flex-wrap: nowrap; /* Ensure elements stay on a single line */
         }
         .color-name {
-            flex: 1;
+            flex: 1 1 auto;
+            min-width: 0; /* Allows text to shrink */
             font-size: 0.9em;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             margin-right: 0.25em;
         }
-        .color-original {
-            width: 1.2em;
-            height: 1.2em;
-            border: 1px solid #cccccc;
-            border-radius: 2px;
+        .controls-container {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+        .controls-container > * {
+            flex: 0 0 auto;
             margin-right: 0.25em;
         }
-        .arrow {
-            margin-right: 0.25em;
-            font-size: 1em;
-        }
+        .color-original,
+        .arrow,
         .color-picker {
-            margin-right: 0.25em;
             width: 1.2em;
-            height: 1.2em;
-            border: none;
-            background: none;
-            padding: 0;
         }
         .hex-input {
             width: 5em;
@@ -129,27 +126,37 @@
                 padding-bottom: 0.25em;
             }
             .color-grid {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
                 gap: 0.25em;
             }
             .color-item {
-                flex-direction: column;
-                align-items: flex-start;
                 padding: 0.25em;
+                flex-wrap: nowrap; /* Keep elements on a single line */
+                align-items: center;
             }
             .color-name {
                 font-size: 0.8em;
-                margin-bottom: 0.25em;
+                margin-right: 0.25em;
+                flex: 1 1 auto;
+                min-width: 0; /* Allows text to shrink */
             }
+            .controls-container > * {
+                margin-right: 0.25em;
+            }
+            .color-original,
+            .arrow,
+            .color-picker {
+                width: 1em;
+            }
+            .hex-input {
+                width: 4em;
+            }
+            /* Remove margin-bottom from elements */
             .color-original,
             .arrow,
             .color-picker,
             .hex-input {
-                margin-right: 0;
-                margin-bottom: 0.25em;
-            }
-            .hex-input {
-                width: 100%;
+                margin-bottom: 0;
             }
             #exportButton {
                 margin: 0.25em auto;
@@ -371,9 +378,7 @@
             colorItem.appendChild(colorName);
 
             const controlsContainer = document.createElement('div');
-            controlsContainer.style.display = 'flex';
-            controlsContainer.style.alignItems = 'center';
-            controlsContainer.style.flexWrap = 'wrap';
+            controlsContainer.className = 'controls-container';
 
             controlsContainer.appendChild(colorOriginal);
             controlsContainer.appendChild(arrow);
