@@ -200,6 +200,7 @@
                     showInput: true,
                     showInitial: true,
                     preferredFormat: "hex",
+                    appendTo: el, // Make picker appear inside the color block
                     change: function(color) {
                         updateColor(el, color.toHexString());
                     }
