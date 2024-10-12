@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Color Picker and Editor with Spectrum</title>
+    <title>Color Picker and Editor with Spectrum and Transparency</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile friendly -->
     <!-- Include Spectrum CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css">
@@ -82,7 +82,7 @@
             padding: 0;
         }
         .hex-input {
-            width: 4.5em;
+            width: 6em;
             padding: 0.2em;
             font-size: 0.9em;
             border: 1px solid #cccccc;
@@ -332,14 +332,17 @@
             colorInput.type = 'text';
             colorInput.className = 'color-picker';
 
-            // Set initial value
+            // Set initial value (including alpha)
+            let hexColor = colorValue.slice(0, 6).toUpperCase();
+            let alpha = colorValue.length >= 8 ? parseInt(colorValue.slice(6, 8), 16) / 255 : 1;
+
             colorInput.value = '#' + colorValue.slice(0, 6);
 
             const hexInput = document.createElement('input');
             hexInput.type = 'text';
-            hexInput.value = colorValue.slice(0, 6).toUpperCase();
+            hexInput.value = colorValue.toUpperCase();
             hexInput.className = 'hex-input';
-            hexInput.maxLength = 6;
+            hexInput.maxLength = 8;
 
             // Append elements
             colorItem.appendChild(colorName);
@@ -352,41 +355,42 @@
 
             // Initialize Spectrum on the colorInput
             $(colorInput).spectrum({
-                color: colorInput.value,
+                color: '#' + hexColor,
                 showInput: false,
                 showInitial: false,
-                preferredFormat: "hex",
-                change: function(tinycolor) {
-                    const newHex = tinycolor.toHexString().toUpperCase();
-                    hexInput.value = newHex.slice(1);
-                    parentData[dataKey] = newHex.slice(1) + colorValue.slice(6);
-                },
+                preferredFormat: "hex8",
+                showAlpha: true,
                 move: function(tinycolor) {
-                    // Optional: update hexInput while moving the selector
-                    const newHex = tinycolor.toHexString().toUpperCase();
-                    hexInput.value = newHex.slice(1);
+                    const newHex8 = tinycolor.toHex8String().toUpperCase();
+                    hexInput.value = newHex8.slice(1);
+                },
+                change: function(tinycolor) {
+                    const newHex8 = tinycolor.toHex8String().toUpperCase();
+                    hexInput.value = newHex8.slice(1);
+                    parentData[dataKey] = newHex8.slice(1);
                 }
             });
 
             // Update functions
             function updateColor(newColor) {
-                if (/^[0-9A-Fa-f]{6}$/.test(newColor)) {
-                    $(colorInput).spectrum("set", '#' + newColor);
-                    parentData[dataKey] = newColor + colorValue.slice(6);
+                if (/^[0-9A-Fa-f]{6,8}$/.test(newColor)) {
+                    let colorString = '#' + newColor;
+                    $(colorInput).spectrum("set", colorString);
+                    parentData[dataKey] = newColor.toUpperCase();
                 }
             }
 
             hexInput.addEventListener('input', function() {
                 const newHex = hexInput.value.toUpperCase();
-                if (/^[0-9A-Fa-f]{6}$/.test(newHex)) {
+                if (/^[0-9A-Fa-f]{6,8}$/.test(newHex)) {
                     updateColor(newHex);
                 }
             });
 
             hexInput.addEventListener('blur', function() {
                 // Validate hex code on blur
-                if (!/^[0-9A-Fa-f]{6}$/.test(hexInput.value)) {
-                    const currentHex = parentData[dataKey].slice(0,6).toUpperCase();
+                if (!/^[0-9A-Fa-f]{6,8}$/.test(hexInput.value)) {
+                    const currentHex = parentData[dataKey].toUpperCase();
                     hexInput.value = currentHex;
                 }
             });
