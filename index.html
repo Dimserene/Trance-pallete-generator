@@ -209,7 +209,6 @@
     <script>
         // Original color data (deep copy to preserve defaults)
         const defaultColorData = {
-            MAIN: {
             SPLASH: ['FE5F55', '009DFF'],
             MULT: 'FE5F55',
             CHIPS: '009dff',
@@ -506,4 +505,59 @@
                     // Update parent data
                     item.parentData[item.dataKey] = item.defaultColorValue;
                     // Update Spectrum color picker
-                    const defau
+                    const defaultHexColor = item.defaultColorValue.slice(0, 6).toUpperCase();
+                    const defaultAlpha = item.defaultColorValue.length >= 8 ? parseInt(item.defaultColorValue.slice(6, 8), 16) / 255 : 1;
+                    const defaultColorString = '#' + defaultHexColor + (defaultAlpha < 1 ? item.defaultColorValue.slice(6, 8) : '');
+                    $(item.colorInput).spectrum("set", defaultColorString);
+                    // Update hex input
+                    item.hexInput.value = item.defaultColorValue.toUpperCase();
+                });
+            }
+        });
+
+        // Export to Lua functionality
+        document.getElementById('exportLuaButton').addEventListener('click', function() {
+            const exportedLua = 'return ' + convertToLuaTable(colorData);
+            document.getElementById('exportLuaOutput').value = exportedLua;
+        });
+
+        // Function to convert JSON object to Lua table format
+        function convertToLuaTable(obj, indent = '') {
+            let lua = '{\n';
+            const indent2 = indent + '    ';
+            for (const key in obj) {
+                const value = obj[key];
+                lua += indent2;
+                if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(key)) {
+                    lua += key + ' = ';
+                } else {
+                    lua += '["' + key + '"] = ';
+                }
+                if (typeof value === 'string') {
+                    lua += '"' + value + '",\n';
+                } else if (typeof value === 'number') {
+                    lua += value + ',\n';
+                } else if (typeof value === 'boolean') {
+                    lua += (value ? 'true' : 'false') + ',\n';
+                } else if (Array.isArray(value)) {
+                    lua += '{ ';
+                    value.forEach(function(item) {
+                        if (typeof item === 'string') {
+                            lua += '"' + item + '", ';
+                        } else {
+                            lua += item + ', ';
+                        }
+                    });
+                    lua += '},\n';
+                } else if (typeof value === 'object') {
+                    lua += convertToLuaTable(value, indent2) + ',\n';
+                } else {
+                    lua += 'nil,\n';
+                }
+            }
+            lua += indent + '}';
+            return lua;
+        }
+    </script>
+</body>
+</html>
