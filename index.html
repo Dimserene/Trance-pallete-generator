@@ -40,7 +40,7 @@
         }
         .color-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            grid-template-columns: 1fr;
             gap: 0.5em;
         }
         .color-item {
@@ -50,19 +50,24 @@
             background-color: #f9f9f9;
             border-radius: 4px;
         }
-        .color-swatch {
-            width: 1.5em;
-            height: 1.5em;
-            border: 1px solid #cccccc;
-            margin-right: 0.25em;
-            border-radius: 2px;
-        }
         .color-name {
-            flex: 1;
+            flex: 0 0 30%;
             font-size: 0.9em;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            margin-right: 0.5em;
+        }
+        .color-original {
+            width: 1.5em;
+            height: 1.5em;
+            border: 1px solid #cccccc;
+            border-radius: 2px;
+            margin-right: 0.5em;
+        }
+        .arrow {
+            margin-right: 0.5em;
+            font-size: 1.2em;
         }
         .color-picker {
             margin-left: auto;
@@ -103,10 +108,17 @@
                 flex: 1 1 100%;
             }
             .color-grid {
-                grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+                grid-template-columns: 1fr;
             }
             .color-item {
-                padding: 0.25em 0;
+                flex-wrap: wrap;
+            }
+            .color-name {
+                flex: 1 1 100%;
+                margin-bottom: 0.25em;
+            }
+            .arrow {
+                display: none;
             }
         }
     </style>
@@ -283,25 +295,29 @@
             const colorItem = document.createElement('div');
             colorItem.className = 'color-item';
 
-            const colorSwatch = document.createElement('div');
-            colorSwatch.className = 'color-swatch';
-            colorSwatch.style.backgroundColor = '#' + colorValue.slice(0, 6);
-
             const colorName = document.createElement('div');
             colorName.className = 'color-name';
             colorName.textContent = displayName;
+
+            const colorOriginal = document.createElement('div');
+            colorOriginal.className = 'color-original';
+            colorOriginal.style.backgroundColor = '#' + colorValue.slice(0, 6);
+
+            const arrow = document.createElement('div');
+            arrow.className = 'arrow';
+            arrow.textContent = '→';
 
             const colorInput = document.createElement('input');
             colorInput.type = 'color';
             colorInput.value = '#' + colorValue.slice(0, 6);
             colorInput.className = 'color-picker';
             colorInput.addEventListener('input', function() {
-                colorSwatch.style.backgroundColor = colorInput.value;
                 parentData[dataKey] = colorInput.value.slice(1) + colorValue.slice(6);
             });
 
-            colorItem.appendChild(colorSwatch);
             colorItem.appendChild(colorName);
+            colorItem.appendChild(colorOriginal);
+            colorItem.appendChild(arrow);
             colorItem.appendChild(colorInput);
 
             container.appendChild(colorItem);
