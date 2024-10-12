@@ -195,7 +195,7 @@
 </head>
 <body>
 
-    <h1>Trance Pallete Generator</h1>
+    <h1>Trance Pallete Generator v1</h1>
 
     <div id="colorContainer"></div>
 
@@ -372,18 +372,9 @@
         const spectrumInstances = [];
 
         // Function to create color pickers using Spectrum
-        function createColorPickers(dataArray, container, categoryName, defaultDataArray) {
-            const categoryDiv = document.createElement('div');
-            categoryDiv.className = 'category';
-
-            if (categoryName) {
-                const categoryTitle = document.createElement('h2');
-                categoryTitle.textContent = categoryName;
-                categoryDiv.appendChild(categoryTitle);
-            }
-
-            const colorGrid = document.createElement('div');
-            colorGrid.className = 'color-grid';
+        function createColorPickers(dataArray, container, defaultDataArray) {
+            const mainCategory = { key: 'Main', items: [] };
+            const categories = [];
 
             dataArray.forEach((item, index) => {
                 const key = item.key;
@@ -392,34 +383,78 @@
 
                 if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object') {
                     // Nested category
-                    const defaultSubData = defaultItem ? defaultItem.value : [];
-                    // Create a container for the nested category inside the current categoryDiv
-                    createColorPickers(value, categoryDiv, key, defaultSubData);
-                } else if (Array.isArray(value) && (typeof value[0] === 'string' || typeof value[0] === 'number')) {
-                    // Array of colors
-                    const defaultArrayData = defaultItem ? defaultItem.value : [];
-                    value.forEach((colorValue, idx) => {
-                        const defaultColorValue = defaultArrayData[idx] || 'FFFFFF';
-                        createColorItem(colorValue, `${key}[${idx}]`, value, idx, colorGrid, defaultColorValue);
+                    categories.push({
+                        key: key,
+                        value: value,
+                        defaultValue: defaultItem ? defaultItem.value : []
                     });
-                } else if (typeof value === 'object' && value !== null) {
-                    // Nested object
-                    const defaultSubData = defaultItem ? defaultItem.value : [];
-                    createColorPickers([value], categoryDiv, key, [defaultSubData]);
                 } else {
-                    const defaultColorValue = defaultItem ? defaultItem.value || 'FFFFFF' : 'FFFFFF';
-                    createColorItem(value, key, dataArray, index, colorGrid, defaultColorValue);
+                    // Unclassified color
+                    mainCategory.items.push({
+                        key: key,
+                        value: value,
+                        dataArray: dataArray,
+                        dataIndex: index,
+                        defaultValue: defaultItem ? defaultItem.value || 'FFFFFF' : 'FFFFFF'
+                    });
                 }
             });
 
-            if (colorGrid.children.length > 0) {
-                categoryDiv.appendChild(colorGrid);
-            }
+            // Display Main category if it has items
+            if (mainCategory.items.length > 0) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
 
-            // Append categoryDiv to the container if it has content
-            if (categoryDiv.children.length > 0) {
+                const categoryTitle = document.createElement('h2');
+                categoryTitle.textContent = mainCategory.key;
+                categoryDiv.appendChild(categoryTitle);
+
+                const colorGrid = document.createElement('div');
+                colorGrid.className = 'color-grid';
+
+                mainCategory.items.forEach(item => {
+                    createColorItem(item.value, item.key, item.dataArray, item.dataIndex, colorGrid, item.defaultValue);
+                });
+
+                categoryDiv.appendChild(colorGrid);
                 container.appendChild(categoryDiv);
             }
+
+            // Now process other categories
+            categories.forEach(category => {
+                const defaultSubData = category.defaultValue;
+
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+
+                const categoryTitle = document.createElement('h2');
+                categoryTitle.textContent = category.key;
+                categoryDiv.appendChild(categoryTitle);
+
+                const colorGrid = document.createElement('div');
+                colorGrid.className = 'color-grid';
+
+                category.value.forEach((subItem, subIndex) => {
+                    const subKey = subItem.key;
+                    const subValue = subItem.value;
+                    const defaultSubItem = defaultSubData ? defaultSubData[subIndex] : null;
+
+                    if (Array.isArray(subValue) && (typeof subValue[0] === 'string' || typeof subValue[0] === 'number')) {
+                        // Array of colors
+                        const defaultArrayData = defaultSubItem ? defaultSubItem.value : [];
+                        subValue.forEach((colorValue, idx) => {
+                            const defaultColorValue = defaultArrayData[idx] || 'FFFFFF';
+                            createColorItem(colorValue, `${subKey}[${idx}]`, subValue, idx, colorGrid, defaultColorValue);
+                        });
+                    } else if (typeof subValue === 'string') {
+                        const defaultColorValue = defaultSubItem ? defaultSubItem.value || 'FFFFFF' : 'FFFFFF';
+                        createColorItem(subValue, subKey, category.value, subIndex, colorGrid, defaultColorValue);
+                    }
+                });
+
+                categoryDiv.appendChild(colorGrid);
+                container.appendChild(categoryDiv);
+            });
         }
 
         function createColorItem(colorValue, displayName, parentDataArray, dataIndex, container, defaultColorValue) {
@@ -545,7 +580,7 @@
 
         // Initialize the color pickers
         const colorContainer = document.getElementById('colorContainer');
-        createColorPickers(colorData, colorContainer, null, defaultColorData);
+        createColorPickers(colorData, colorContainer, defaultColorData);
 
         // Reset All functionality
         document.getElementById('resetAllButton').addEventListener('click', function() {
