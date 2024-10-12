@@ -55,6 +55,7 @@
         .arrow {
             font-size: 1.2em;
             margin: 0 10px;
+            display: inline-block;
         }
         button {
             margin-top: 20px;
@@ -104,35 +105,35 @@
                 <div class="subtitle">SPLASH</div>
                 <span class="default-color" style="background-color: #FE5F55;">#FE5F55</span>
                 <span class="arrow">→</span>
-                <span class="new-color" id="SPLASH" style="background-color: #FE5F55;">#FE5F55</span>
+                <input class="new-color" id="SPLASH" style="background-color: #FE5F55;" readonly>
             </div>
             <!-- MULT -->
             <div class="palette-item">
                 <div class="subtitle">MULT</div>
                 <span class="default-color" style="background-color: #FE5F55;">#FE5F55</span>
                 <span class="arrow">→</span>
-                <span class="new-color" id="MULT" style="background-color: #FE5F55;">#FE5F55</span>
+                <input class="new-color" id="MULT" style="background-color: #FE5F55;" readonly>
             </div>
             <!-- CHIPS -->
             <div class="palette-item">
                 <div class="subtitle">CHIPS</div>
                 <span class="default-color" style="background-color: #009DFF;">#009DFF</span>
                 <span class="arrow">→</span>
-                <span class="new-color" id="CHIPS" style="background-color: #009DFF;">#009DFF</span>
+                <input class="new-color" id="CHIPS" style="background-color: #009DFF;" readonly>
             </div>
             <!-- PLASMA -->
             <div class="palette-item">
                 <div class="subtitle">PLASMA</div>
                 <span class="default-color" style="background-color: #CC73D9;">#CC73D9</span>
                 <span class="arrow">→</span>
-                <span class="new-color" id="PLASMA" style="background-color: #CC73D9;">#CC73D9</span>
+                <input class="new-color" id="PLASMA" style="background-color: #CC73D9;" readonly>
             </div>
             <!-- MONEY -->
             <div class="palette-item">
                 <div class="subtitle">MONEY</div>
                 <span class="default-color" style="background-color: #F3B958;">#F3B958</span>
                 <span class="arrow">→</span>
-                <span class="new-color" id="MONEY" style="background-color: #F3B958;">#F3B958</span>
+                <input class="new-color" id="MONEY" style="background-color: #F3B958;" readonly>
             </div>
             <!-- Continue adding other main colors similarly -->
         </div>
@@ -145,14 +146,14 @@
                 <div class="subtitle">TEXT_LIGHT</div>
                 <span class="default-color" style="background-color: #FFFFFF;">#FFFFFF</span>
                 <span class="arrow">→</span>
-                <span class="new-color" id="UI_TEXT_LIGHT" style="background-color: #FFFFFF;">#FFFFFF</span>
+                <input class="new-color" id="UI_TEXT_LIGHT" style="background-color: #FFFFFF;" readonly>
             </div>
             <!-- TEXT_DARK -->
             <div class="palette-item">
                 <div class="subtitle">TEXT_DARK</div>
                 <span class="default-color" style="background-color: #4F6367;">#4F6367</span>
                 <span class="arrow">→</span>
-                <span class="new-color" id="UI_TEXT_DARK" style="background-color: #4F6367;">#4F6367</span>
+                <input class="new-color" id="UI_TEXT_DARK" style="background-color: #4F6367;" readonly>
             </div>
             <!-- Continue with other UI colors... -->
         </div>
@@ -165,7 +166,7 @@
                 <div class="subtitle">bl_ox</div>
                 <span class="default-color" style="background-color: #B95B08;">#B95B08</span>
                 <span class="arrow">→</span>
-                <span class="new-color" id="BOSSES_bl_ox" style="background-color: #B95B08;">#B95B08</span>
+                <input class="new-color" id="BOSSES_bl_ox" style="background-color: #B95B08;" readonly>
             </div>
             <!-- Add other BOSSES colors similarly -->
         </div>
@@ -178,7 +179,7 @@
                 <div class="subtitle">Default</div>
                 <span class="default-color" style="background-color: #CDD9DC;">#CDD9DC</span>
                 <span class="arrow">→</span>
-                <span class="new-color" id="SET_Default" style="background-color: #CDD9DC;">#CDD9DC</span>
+                <input class="new-color" id="SET_Default" style="background-color: #CDD9DC;" readonly>
             </div>
             <!-- Add other SET colors similarly -->
         </div>
@@ -209,7 +210,7 @@
         // Function to update the new color and background dynamically
         function updateColor(element, colorValue) {
             element.style.backgroundColor = colorValue;
-            element.textContent = colorValue.toUpperCase();
+            element.value = colorValue.toUpperCase();
             element.style.color = getContrastingColor(colorValue);
         }
 
