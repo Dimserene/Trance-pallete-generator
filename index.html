@@ -393,6 +393,7 @@
                 if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object') {
                     // Nested category
                     const defaultSubData = defaultItem ? defaultItem.value : [];
+                    // Create a container for the nested category inside the current categoryDiv
                     createColorPickers(value, categoryDiv, key, defaultSubData);
                 } else if (Array.isArray(value) && (typeof value[0] === 'string' || typeof value[0] === 'number')) {
                     // Array of colors
@@ -411,8 +412,14 @@
                 }
             });
 
-            categoryDiv.appendChild(colorGrid);
-            container.appendChild(categoryDiv);
+            if (colorGrid.children.length > 0) {
+                categoryDiv.appendChild(colorGrid);
+            }
+
+            // Append categoryDiv to the container if it has content
+            if (categoryDiv.children.length > 0) {
+                container.appendChild(categoryDiv);
+            }
         }
 
         function createColorItem(colorValue, displayName, parentDataArray, dataIndex, container, defaultColorValue) {
