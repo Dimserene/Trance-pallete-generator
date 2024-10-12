@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Color Picker and Editor with Original Colors Displaying</title>
+    <title>Color Picker and Editor with Wrapped Text Labels</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile friendly -->
     <!-- Include Spectrum CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css">
@@ -58,25 +58,25 @@
             padding: 0.25em;
             background-color: #f9f9f9;
             border-radius: 4px;
-            flex-wrap: nowrap; /* Ensure elements stay on a single line */
+            flex-wrap: wrap; /* Allow elements to wrap */
         }
         .color-name {
-            flex: 1 1 auto;
+            flex: 1 1 100%; /* Allow full width */
             min-width: 0; /* Allows text to shrink */
             font-size: 0.9em;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            overflow-wrap: break-word; /* Break long words */
             margin-right: 0.25em;
+            margin-bottom: 0.25em; /* Add margin below for spacing */
         }
         .controls-container {
             display: flex;
             align-items: center;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
         }
         .controls-container > * {
             flex: 0 0 auto;
             margin-right: 0.25em;
+            margin-bottom: 0.25em; /* Add margin for wrapping */
         }
         .color-original,
         .arrow,
@@ -150,17 +150,19 @@
             }
             .color-item {
                 padding: 0.25em;
-                flex-wrap: nowrap; /* Keep elements on a single line */
+                flex-wrap: wrap; /* Allow elements to wrap */
                 align-items: center;
             }
             .color-name {
                 font-size: 0.8em;
                 margin-right: 0.25em;
-                flex: 1 1 auto;
+                margin-bottom: 0.25em;
+                flex: 1 1 100%;
                 min-width: 0; /* Allows text to shrink */
             }
             .controls-container > * {
                 margin-right: 0.25em;
+                margin-bottom: 0.25em;
             }
             .color-original,
             .arrow,
@@ -364,11 +366,11 @@
                 } else if (Array.isArray(data[key])) {
                     const defaultArrayData = defaultData ? defaultData[key] : [];
                     data[key].forEach((item, index) => {
-                        const defaultItemValue = defaultArrayData[index];
+                        const defaultItemValue = defaultArrayData[index] || 'FFFFFF';
                         createColorItem(item, `${key}[${index}]`, data[key], index, colorGrid, defaultItemValue);
                     });
                 } else {
-                    const defaultValue = defaultData ? defaultData[key] : '';
+                    const defaultValue = defaultData ? defaultData[key] || 'FFFFFF' : 'FFFFFF';
                     createColorItem(data[key], key, data, key, colorGrid, defaultValue);
                 }
             }
