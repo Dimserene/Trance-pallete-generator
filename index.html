@@ -69,7 +69,7 @@
         .color-comment {
             font-size: 0.8em;
             color: #555;
-            margin-bottom: 0.5em;
+            margin-top: 0.5em; /* Adjusted margin */
         }
         .controls-container {
             display: flex;
@@ -106,7 +106,8 @@
             margin-right: 0.25em;
         }
         #resetAllButton,
-        #exportLuaButton {
+        #exportLuaButton,
+        #downloadLuaButton {
             display: inline-block;
             margin: 0.5em;
             padding: 0.5em 1em;
@@ -118,7 +119,8 @@
             cursor: pointer;
         }
         #resetAllButton:hover,
-        #exportLuaButton:hover {
+        #exportLuaButton:hover,
+        #downloadLuaButton:hover {
             background-color: #4f6367;
         }
         #exportLuaOutput {
@@ -178,7 +180,8 @@
                 width: 4em;
             }
             #resetAllButton,
-            #exportLuaButton {
+            #exportLuaButton,
+            #downloadLuaButton {
                 margin: 0.25em;
                 padding: 0.5em 1em;
             }
@@ -198,6 +201,7 @@
     <div style="text-align: center;">
         <button id="resetAllButton">Reset All</button>
         <button id="exportLuaButton">Export</button>
+        <button id="downloadLuaButton">Download Lua File</button>
     </div>
     <textarea id="exportLuaOutput" placeholder="Updated colors in Lua format will appear here..."></textarea>
 
@@ -473,34 +477,34 @@
             {
                 key: 'BOSSES',
                 value: [
-                    { key: 'bl_ox', value: 'B95B08', comment: 'Boss color for The Ox' },
-                    { key: 'bl_hook', value: 'A84024', comment: 'Boss color for The Hook' },
-                    { key: 'bl_mouth', value: 'AE718E', comment: 'Boss color for The Mouth' },
-                    { key: 'bl_fish', value: '3E85BD', comment: 'Boss color for The Fish' },
-                    { key: 'bl_club', value: 'B9CB92', comment: 'Boss color for The Club' },
-                    { key: 'bl_manacle', value: '575757', comment: 'Boss color for The Manacle' },
-                    { key: 'bl_tooth', value: 'B52D2D', comment: 'Boss color for The Tooth' },
-                    { key: 'bl_wall', value: '8A59A5', comment: 'Boss color for The Wall' },
-                    { key: 'bl_house', value: '5186A8', comment: 'Boss color for The House' },
-                    { key: 'bl_mark', value: '6A3847', comment: 'Boss color for The Mark' },
-                    { key: 'bl_wheel', value: '50BF7C', comment: 'Boss color for The Wheel' },
-                    { key: 'bl_arm', value: '6865F3', comment: 'Boss color for The Arm' },
-                    { key: 'bl_psychic', value: 'EFC03C', comment: 'Boss color for The Psychic' },
-                    { key: 'bl_goad', value: 'B95C96', comment: 'Boss color for The Goad' },
-                    { key: 'bl_water', value: 'C6E0EB', comment: 'Boss color for The Water' },
-                    { key: 'bl_eye', value: '4B71E4', comment: 'Boss color for The Eye' },
-                    { key: 'bl_plant', value: '709284', comment: 'Boss color for The Plant' },
-                    { key: 'bl_needle', value: '5C6E31', comment: 'Boss color for The Needle' },
-                    { key: 'bl_head', value: 'AC9DB4', comment: 'Boss color for The Head' },
-                    { key: 'bl_window', value: 'A9A295', comment: 'Boss color for The Window' },
-                    { key: 'bl_serpent', value: '439A4F', comment: 'Boss color for The Serpent' },
-                    { key: 'bl_pillar', value: '7E6752', comment: 'Boss color for The Pillar' },
-                    { key: 'bl_flint', value: 'E56A2F', comment: 'Boss color for The Flint' },
-                    { key: 'bl_final_bell', value: '009CFD', comment: 'Boss color for Cerulean Bell' },
-                    { key: 'bl_final_leaf', value: '56A786', comment: 'Boss color for Verdant Leaf' },
-                    { key: 'bl_final_vessel', value: '8A71E1', comment: 'Boss color for Violet Vessel' },
-                    { key: 'bl_final_acorn', value: 'FDA200', comment: 'Boss color for Amber Acorn' },
-                    { key: 'bl_final_heart', value: 'AC3232', comment: 'Boss color for Crimson Heart' }
+                    { key: 'bl_ox', value: 'B95B08', comment: 'Boss color for The ox' },
+                    { key: 'bl_hook', value: 'A84024', comment: 'Boss color for The hook' },
+                    { key: 'bl_mouth', value: 'AE718E', comment: 'Boss color for The mouth' },
+                    { key: 'bl_fish', value: '3E85BD', comment: 'Boss color for The fish' },
+                    { key: 'bl_club', value: 'B9CB92', comment: 'Boss color for The club' },
+                    { key: 'bl_manacle', value: '575757', comment: 'Boss color for The manacle' },
+                    { key: 'bl_tooth', value: 'B52D2D', comment: 'Boss color for The tooth' },
+                    { key: 'bl_wall', value: '8A59A5', comment: 'Boss color for The wall' },
+                    { key: 'bl_house', value: '5186A8', comment: 'Boss color for The house' },
+                    { key: 'bl_mark', value: '6A3847', comment: 'Boss color for The mark' },
+                    { key: 'bl_wheel', value: '50BF7C', comment: 'Boss color for The wheel' },
+                    { key: 'bl_arm', value: '6865F3', comment: 'Boss color for The arm' },
+                    { key: 'bl_psychic', value: 'EFC03C', comment: 'Boss color for The psychic' },
+                    { key: 'bl_goad', value: 'B95C96', comment: 'Boss color for The goad' },
+                    { key: 'bl_water', value: 'C6E0EB', comment: 'Boss color for The water' },
+                    { key: 'bl_eye', value: '4B71E4', comment: 'Boss color for The eye' },
+                    { key: 'bl_plant', value: '709284', comment: 'Boss color for The plant' },
+                    { key: 'bl_needle', value: '5C6E31', comment: 'Boss color for The needle' },
+                    { key: 'bl_head', value: 'AC9DB4', comment: 'Boss color for The head' },
+                    { key: 'bl_window', value: 'A9A295', comment: 'Boss color for The window' },
+                    { key: 'bl_serpent', value: '439A4F', comment: 'Boss color for The serpent' },
+                    { key: 'bl_pillar', value: '7E6752', comment: 'Boss color for The pillar' },
+                    { key: 'bl_flint', value: 'E56A2F', comment: 'Boss color for The flint' },
+                    { key: 'bl_final_bell', value: '009CFD', comment: 'Boss color for final bell' },
+                    { key: 'bl_final_leaf', value: '56A786', comment: 'Boss color for final leaf' },
+                    { key: 'bl_final_vessel', value: '8A71E1', comment: 'Boss color for final vessel' },
+                    { key: 'bl_final_acorn', value: 'FDA200', comment: 'Boss color for final acorn' },
+                    { key: 'bl_final_heart', value: 'AC3232', comment: 'Boss color for final heart' }
                 ],
                 comment: 'Boss-specific colors'
             }
@@ -787,7 +791,11 @@
                     // Update parent data
                     item.defaultColorValue = item.defaultColorValue || 'FFFFFF';
                     if (Array.isArray(item.parentDataArray)) {
-                        item.parentDataArray[item.dataIndex].value = item.defaultColorValue;
+                        if (item.parentDataArray[item.dataIndex].hasOwnProperty('value')) {
+                            item.parentDataArray[item.dataIndex].value = item.defaultColorValue;
+                        } else {
+                            item.parentDataArray[item.dataIndex] = item.defaultColorValue;
+                        }
                     } else {
                         item.parentDataArray.value = item.defaultColorValue;
                     }
@@ -806,6 +814,39 @@
         document.getElementById('exportLuaButton').addEventListener('click', function() {
             const exportedLua = 'return ' + convertToLuaTable(colorData);
             document.getElementById('exportLuaOutput').value = exportedLua;
+        });
+
+        // Download Lua File functionality
+        document.getElementById('downloadLuaButton').addEventListener('click', function() {
+            const exportedLua = 'return ' + convertToLuaTable(colorData);
+
+            // Prompt the user for a file name
+            let fileName = prompt('Enter file name for the Lua file:', 'New Theme.lua');
+            if (fileName === null) {
+                // User cancelled the prompt
+                return;
+            }
+            if (!fileName.endsWith('.lua')) {
+                fileName += '.lua';
+            }
+
+            // Create a Blob from the Lua code
+            const blob = new Blob([exportedLua], { type: 'text/plain;charset=utf-8' });
+
+            // Create a link element
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+
+            // Append to the body
+            document.body.appendChild(link);
+
+            // Trigger the download
+            link.click();
+
+            // Clean up
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
         });
 
         // Function to convert the array-based color data to Lua table format
@@ -827,7 +868,12 @@
                         lua += '{\n';
                         value.forEach(function(val) {
                             if (val.key) {
-                                lua += indent2 + '    ' + val.key + ' = HEX(\'' + val.value + '\'),\n';
+                                lua += indent2 + '    ';
+                                if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(val.key)) {
+                                    lua += val.key + ' = HEX(\'' + val.value + '\'),\n';
+                                } else {
+                                    lua += '["' + val.key + '"] = HEX(\'' + val.value + '\'),\n';
+                                }
                             } else {
                                 lua += indent2 + '    HEX(\'' + val.value + '\'),\n';
                             }
