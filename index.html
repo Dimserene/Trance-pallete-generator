@@ -211,7 +211,7 @@
             {
                 key: 'SPLASH',
                 value: ['FE5F55', '009DFF'],
-                comment: 'Title Screen / Boss Screen colors'
+                comment: ['Affects Title Screen / Boss Screen colors', 'Affects Title Screen / Boss Screen colors']
             },
             {
                 key: 'MULT',
@@ -362,20 +362,20 @@
             {
                 key: 'SO_1',
                 value: [
-                    { key: 'Hearts', value: 'F03464', comment: '' },
-                    { key: 'Diamonds', value: 'F06B3F', comment: '' },
-                    { key: 'Spades', value: '403995', comment: '' },
-                    { key: 'Clubs', value: '235955', comment: '' }
+                    { key: 'Hearts', value: 'F03464', comment: 'High Contrast Heart Suit Colors (when mentioned)' },
+                    { key: 'Diamonds', value: 'F06B3F', comment: 'High Contrast Diamonds Suit Colors (when mentioned)' },
+                    { key: 'Spades', value: '403995', comment: 'High Contrast Spades Suit Colors (when mentioned)' },
+                    { key: 'Clubs', value: '235955', comment: 'High Contrast Clubs Suit Colors (when mentioned)' }
                 ],
                 comment: 'High Contrast Suit Colors (when mentioned)'
             },
             {
                 key: 'SO_2',
                 value: [
-                    { key: 'Hearts', value: 'F83B2F', comment: '' },
-                    { key: 'Diamonds', value: 'E29000', comment: '' },
-                    { key: 'Spades', value: '4F31B9', comment: '' },
-                    { key: 'Clubs', value: '008EE6', comment: '' }
+                    { key: 'Hearts', value: 'F83B2F', comment: 'Normal Hearts suit colors (when mentioned)' },
+                    { key: 'Diamonds', value: 'E29000', comment: 'Normal Diamonds suit colors (when mentioned)' },
+                    { key: 'Spades', value: '4F31B9', comment: 'Normal Spades suit colors (when mentioned)' },
+                    { key: 'Clubs', value: '008EE6', comment: 'Normal Clubs suit colors (when mentioned)' }
                 ],
                 comment: 'Normal suit colors (when mentioned)'
             },
@@ -428,8 +428,7 @@
             {
                 key: 'RARITY',
                 value: ['009DFF', '4BC292', 'FE5F55', 'B26CBB'],
-                comment: 'Rarities',
-                subComments: ['Common', 'Uncommon', 'Rare', 'Legendary']
+                comment: ['Common', 'Uncommon', 'Rare', 'Legendary']
             },
             {
                 key: 'BLIND',
@@ -444,8 +443,7 @@
             {
                 key: 'HAND_LEVELS',
                 value: ['EFEFEF', '95ACFF', '65EFAF', 'FAE37E', 'FFC052', 'F87D75', 'CAA0EF'],
-                comment: 'Hand Levels',
-                subComments: ['Lvl 1', 'Lvl 2', 'Lvl 3', 'Lvl 4', 'Lvl 5', 'Lvl 6', 'Lvl 7+']
+                comment: ['Lvl 1', 'Lvl 2', 'Lvl 3', 'Lvl 4', 'Lvl 5', 'Lvl 6', 'Lvl 7+']
             },
             {
                 key: 'BACKGROUND',
@@ -500,93 +498,26 @@
 
         // Function to create color pickers using Spectrum
         function createColorPickers(dataArray, container, defaultDataArray) {
-            const mainCategory = { key: 'Main', items: [] };
-            const levelsCategory = { key: 'Levels and Rarity', items: [] };
-            const categories = [];
-
             dataArray.forEach((item, index) => {
                 const key = item.key;
                 const value = item.value;
-                const comment = item.comment || '';
-                const defaultItem = defaultDataArray ? defaultDataArray[index] : null;
-
-                if (key === 'RARITY' || key === 'HAND_LEVELS') {
-                    // Group RARITY and HAND_LEVELS under "Levels and Rarity"
-                    levelsCategory.items.push({
-                        key: key,
-                        value: value,
-                        comment: comment,
-                        dataArray: dataArray,
-                        dataIndex: index,
-                        defaultValue: defaultItem ? defaultItem.value : value
-                    });
-                } else if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object') {
-                    // Nested category
-                    categories.push({
-                        key: key,
-                        value: value,
-                        comment: comment,
-                        defaultValue: defaultItem ? defaultItem.value : []
+                const comments = item.comments || []; // Get comments for each item
+        
+                // Check if the value is an array of colors
+                if (Array.isArray(value)) {
+                    value.forEach((color, idx) => {
+                        const displayName = `${key}[${idx}]`;  // e.g., SPLASH[0], SPLASH[1]
+                        const comment = comments[idx] || '';   // Get the corresponding comment for each color
+                        const defaultColor = defaultDataArray[index].value[idx]; // Default color value
+        
+                        createColorItem(color, displayName, value, idx, container, defaultColor, comment);
                     });
                 } else {
-                    // Unclassified color or array of colors
-                    mainCategory.items.push({
-                        key: key,
-                        value: value,
-                        comment: comment,
-                        dataArray: dataArray,
-                        dataIndex: index,
-                        defaultValue: defaultItem ? defaultItem.value : value
-                    });
+                    // For single color items (non-array)
+                    const comment = item.comment || ''; // Handle comment for single color items
+                    const defaultColor = defaultDataArray[index].value;
+                    createColorItem(value, key, dataArray, index, container, defaultColor, comment);
                 }
-            });
-
-            // Display Main category if it has items
-            if (mainCategory.items.length > 0) {
-                createCategoryDiv(mainCategory, container);
-            }
-
-            // Display Levels and Rarity category if it has items
-            if (levelsCategory.items.length > 0) {
-                createCategoryDiv(levelsCategory, container);
-            }
-
-            // Now process other categories
-            categories.forEach(category => {
-                const defaultSubData = category.defaultValue;
-
-                const categoryDiv = document.createElement('div');
-                categoryDiv.className = 'category';
-
-                const categoryTitle = document.createElement('h2');
-                categoryTitle.textContent = category.key;
-                categoryDiv.appendChild(categoryTitle);
-
-                const colorGrid = document.createElement('div');
-                colorGrid.className = 'color-grid';
-
-                category.value.forEach((subItem, subIndex) => {
-                    const subKey = subItem.key;
-                    const subValue = subItem.value;
-                    const subComment = subItem.comment || '';
-                    const defaultSubItem = defaultSubData ? defaultSubData[subIndex] : null;
-
-                    if (Array.isArray(subValue) && (typeof subValue[0] === 'string' || typeof subValue[0] === 'number')) {
-                        // Array of colors
-                        const defaultArrayData = defaultSubItem ? defaultSubItem.value : [];
-                        subValue.forEach((colorValue, idx) => {
-                            const defaultColorValue = defaultArrayData[idx] || 'FFFFFF';
-                            const subSubComment = subItem.subComments ? subItem.subComments[idx] : '';
-                            createColorItem(colorValue, `${subKey}[${idx}]`, subValue, idx, colorGrid, defaultColorValue, subSubComment);
-                        });
-                    } else if (typeof subValue === 'string') {
-                        const defaultColorValue = defaultSubItem ? defaultSubItem.value || 'FFFFFF' : 'FFFFFF';
-                        createColorItem(subValue, subKey, category.value, subIndex, colorGrid, defaultColorValue, subComment);
-                    }
-                });
-
-                categoryDiv.appendChild(colorGrid);
-                container.appendChild(categoryDiv);
             });
         }
 
@@ -622,9 +553,7 @@
         }
 
         function createColorItem(colorValue, displayName, parentDataArray, dataIndex, container, defaultColorValue, comment = '') {
-            // Provide a default value if defaultColorValue is undefined
-            defaultColorValue = defaultColorValue || 'FFFFFF';
-        
+            // Create the color item as usual (colorName, colorPicker, etc.)
             const colorItem = document.createElement('div');
             colorItem.className = 'color-item';
         
@@ -632,6 +561,7 @@
             colorName.className = 'color-name';
             colorName.textContent = displayName;
         
+            // Append the color name to the item
             colorItem.appendChild(colorName);
         
             const controlsContainer = document.createElement('div');
@@ -645,15 +575,9 @@
             arrow.className = 'arrow';
             arrow.textContent = '→';
         
-            // Create an input for Spectrum
             const colorInput = document.createElement('input');
             colorInput.type = 'text';
             colorInput.className = 'color-picker';
-        
-            // Set initial value (including alpha)
-            let hexColor = colorValue.slice(0, 6).toUpperCase();
-            let alpha = colorValue.length >= 8 ? parseInt(colorValue.slice(6, 8), 16) / 255 : 1;
-        
             colorInput.value = '#' + colorValue.slice(0, 6);
         
             const hexInput = document.createElement('input');
@@ -662,64 +586,37 @@
             hexInput.className = 'hex-input';
             hexInput.maxLength = 8;
         
-            // Reset Button
             const resetButton = document.createElement('button');
             resetButton.className = 'reset-button';
             resetButton.title = 'Reset to Default';
-            resetButton.addEventListener('click', function() {
-                // Reset data
-                if (Array.isArray(parentDataArray)) {
-                    parentDataArray[dataIndex] = defaultColorValue;
-                } else {
-                    parentDataArray.value = defaultColorValue;
-                }
-                // Update Spectrum color picker
-                const defaultHexColor = defaultColorValue.slice(0, 6).toUpperCase();
-                const defaultAlpha = defaultColorValue.length >= 8 ? parseInt(defaultColorValue.slice(6, 8), 16) / 255 : 1;
-                const defaultColorString = '#' + defaultHexColor + (defaultAlpha < 1 ? defaultColorValue.slice(6, 8) : '');
-                $(colorInput).spectrum("set", defaultColorString);
-                // Update hex input
-                hexInput.value = defaultColorValue.toUpperCase();
-            });
         
-            // Append elements to controlsContainer
+            // Append controls
             controlsContainer.appendChild(colorOriginal);
             controlsContainer.appendChild(arrow);
             controlsContainer.appendChild(colorInput);
             controlsContainer.appendChild(hexInput);
             controlsContainer.appendChild(resetButton);
-        
-            // Append controlsContainer to colorItem
             colorItem.appendChild(controlsContainer);
         
-            // Now append the comment after the controlsContainer
+            // Now append the individual comment below the color picker
             if (comment) {
                 const colorComment = document.createElement('div');
                 colorComment.className = 'color-comment';
-                colorComment.textContent = comment;
+                colorComment.textContent = comment; // Add individual comment
                 colorItem.appendChild(colorComment);
             }
         
-            // Append the colorItem to the container
             container.appendChild(colorItem);
         
-            // Initialize Spectrum on the colorInput
+            // Initialize Spectrum picker and handle events (color change, reset, etc.)
             const spectrumInstance = $(colorInput).spectrum({
-                color: '#' + hexColor + (alpha < 1 ? Math.round(alpha * 255).toString(16).padStart(2, '0') : ''),
-                showInput: false,
-                showInitial: false,
-                preferredFormat: "hex8",
+                color: '#' + colorValue.slice(0, 6),
                 showAlpha: true,
-                move: function(tinycolor) {
-                    const newHex8 = tinycolor.toHex8String().toUpperCase();
-                    hexInput.value = newHex8.slice(1);
-                },
                 change: function(tinycolor) {
-                    const newHex8 = tinycolor.toHex8String().toUpperCase();
-                    hexInput.value = newHex8.slice(1);
-                    updateParentData(newHex8.slice(1));
+                    parentDataArray[dataIndex] = tinycolor.toHexString().toUpperCase().slice(1);
                 }
             });
+        }
         
             // Store reference for reset all functionality
             spectrumInstances.push({
