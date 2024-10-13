@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Trance Palette Generator</title> <!-- Default title -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Include Spectrum CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css">
     <script>
         // Array of possible titles
         const titles = [
@@ -119,8 +121,6 @@
         // Run the function on page load
         window.onload = setRandomTitle;
     </script>
-    <!-- Include Spectrum CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css">
     <style>
         /* Base CSS Styles */
         body {
@@ -316,6 +316,7 @@
 
     <div style="text-align: center;">
         <button id="importFileButton">Import from File</button>
+        <button id="importTextButton">Import from Text</button>
     </div>
 
     <div id="colorContainer"></div>
@@ -325,7 +326,7 @@
         <button id="exportLuaButton">Export</button>
         <button id="downloadLuaButton">Download Lua File</button>
     </div>
-    <textarea id="exportLuaOutput" placeholder="Updated colors in Lua format will appear here..."></textarea>
+    <textarea id="exportLuaOutput" placeholder="Paste, edit, or export your Lua code here..."></textarea>
 
     <!-- Include jQuery (Spectrum dependency) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -336,6 +337,7 @@
         const defaultColorData = [
             {
                 key: 'SPLASH',
+                displayName: 'Title Screen/Boss Screen swirl Color',
                 value: [
                     { value: 'FE5F55', comment: 'Splash Color 1' },
                     { value: '009DFF', comment: 'Splash Color 2' }
@@ -479,6 +481,7 @@
             },
             {
                 key: 'DYN_UI',
+                displayName: 'Dynamic UI',
                 value: [
                     { key: 'MAIN', value: '374244', comment: 'Dynamic UI main color' },
                     { key: 'DARK', value: '374244', comment: 'Dynamic UI dark color' },
@@ -490,6 +493,7 @@
             },
             {
                 key: 'SO_1',
+                displayName: 'High Contrast Suit Colors',
                 value: [
                     { key: 'Hearts', value: 'F03464', comment: 'High contrast Hearts suit' },
                     { key: 'Diamonds', value: 'F06B3F', comment: 'High contrast Diamonds suit' },
@@ -500,6 +504,7 @@
             },
             {
                 key: 'SO_2',
+                displayName: 'Normal Suit Colors',
                 value: [
                     { key: 'Hearts', value: 'F83B2F', comment: 'Normal Hearts suit' },
                     { key: 'Diamonds', value: 'E29000', comment: 'Normal Diamonds suit' },
@@ -510,6 +515,7 @@
             },
             {
                 key: 'UI',
+                displayName: 'UI Texts and Background Colors',
                 value: [
                     { key: 'TEXT_LIGHT', value: 'FFFFFF', comment: 'Light text' },
                     { key: 'TEXT_DARK', value: '4F6367', comment: 'Dark text' },
@@ -529,6 +535,7 @@
             },
             {
                 key: 'SET',
+                displayName: 'Background Colors for Card Sets',
                 value: [
                     { value: 'CDD9DC', comment: 'Default set color' },
                     { value: 'CDD9DC', comment: 'Enhanced set color' },
@@ -542,6 +549,7 @@
             },
             {
                 key: 'SECONDARY_SET',
+                displayName: 'Secondary Background Color for Card Set',
                 value: [
                     { value: '9BB6BDFF', comment: 'Default secondary color' },
                     { value: '8389DDFF', comment: 'Enhanced secondary color' },
@@ -589,6 +597,7 @@
             },
             {
                 key: 'BACKGROUND',
+                displayName: 'Background Colors',
                 value: [
                     { key: 'L', value: 'FFFF00', comment: 'Background Light' },
                     { key: 'D', value: '374244', comment: 'Background Dark' },
@@ -598,6 +607,7 @@
             },
             {
                 key: 'BOSSES',
+                displayName: 'Bosses Colors (does not affect background color)',
                 value: [
                     { key: 'bl_ox', value: 'B95B08', comment: 'Boss color for The ox' },
                     { key: 'bl_hook', value: 'A84024', comment: 'Boss color for The hook' },
@@ -961,9 +971,9 @@
             return lua;
         }
         
-        // Import from Text functionality
+        // Event listener for 'Import from Text' button
         document.getElementById('importTextButton').addEventListener('click', function() {
-            const luaCode = document.getElementById('luaTextInput').value;
+            const luaCode = document.getElementById('exportLuaOutput').value;
             try {
                 const importedData = parseLuaPalette(luaCode);
                 if (importedData) {
@@ -980,22 +990,42 @@
 
         function parseLuaPalette(luaCode) {
             const hexPattern = /HEX'([0-9A-Fa-f]{6,8})'/g;
+            const keyPattern = /(\w+)\s*=\s*(\{[\s\S]*?\}|HEX'([0-9A-Fa-f]{6,8})')/g;
+
             const parsedData = JSON.parse(JSON.stringify(defaultColorData));
             let match;
 
-            while ((match = hexPattern.exec(luaCode)) !== null) {
-                const hexValue = match[1];
-                const key = match[2];
+            while ((match = keyPattern.exec(luaCode)) !== null) {
+                const key = match[1];
+                const valueStr = match[2];
+                const hexValue = match[3] || '';
+
                 const item = parsedData.find(item => item.key === key);
                 if (item) {
-                    item.value = hexValue;
+                    if (valueStr.startsWith('{')) {
+                        // Parse nested array
+                        const nestedHexPattern = /HEX'([0-9A-Fa-f]{6,8})'/g;
+                        const values = [];
+                        let nestedMatch;
+                        while ((nestedMatch = nestedHexPattern.exec(valueStr)) !== null) {
+                            values.push(nestedMatch[1]);
+                        }
+                        if (Array.isArray(item.value)) {
+                            for (let i = 0; i < item.value.length; i++) {
+                                if (values[i]) {
+                                    item.value[i].value = values[i];
+                                }
+                            }
+                        }
+                    } else if (hexValue) {
+                        // Single HEX value
+                        item.value = hexValue;
+                    }
                 }
             }
 
             return parsedData;
         }
-
-        createColorPickers(colorData, document.getElementById('colorContainer'), defaultColorData);
     </script>
 </body>
 </html>
