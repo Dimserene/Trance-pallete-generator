@@ -2,14 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Trance Palette Generator v1.2</title>
+    <title>Trance Palette Generator v1</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile friendly -->
     <!-- Include Spectrum CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css">
-    <!-- Include Luaparse (Moved here to ensure it loads before any scripts that use it) -->
-    <script src="https://cdn.jsdelivr.net/npm/luaparse@0.3.1/dist/luaparse.min.js"></script>
     <style>
-        /* [Your existing CSS styles remain unchanged] */
         /* Base CSS Styles */
         body {
             font-family: Arial, sans-serif;
@@ -106,8 +103,7 @@
             margin-right: 0.25em;
         }
         #resetAllButton,
-        #exportLuaButton,
-        #importLuaButton {
+        #exportLuaButton {
             display: inline-block;
             margin: 0.5em;
             padding: 0.5em 1em;
@@ -119,8 +115,7 @@
             cursor: pointer;
         }
         #resetAllButton:hover,
-        #exportLuaButton:hover,
-        #importLuaButton:hover {
+        #exportLuaButton:hover {
             background-color: #4f6367;
         }
         #exportLuaOutput {
@@ -187,8 +182,7 @@
                 margin-bottom: 0;
             }
             #resetAllButton,
-            #exportLuaButton,
-            #importLuaButton {
+            #exportLuaButton {
                 margin: 0.25em;
                 padding: 0.5em 1em;
             }
@@ -201,15 +195,13 @@
 </head>
 <body>
 
-    <h1>Trance Palette Generator v1.2.1a</h1>
+    <h1>Trance Palette Generator v1.2</h1>
 
     <div id="colorContainer"></div>
 
     <div style="text-align: center;">
         <button id="resetAllButton">Reset All</button>
-        <button id="exportLuaButton">Export Lua File</button>
-        <input type="file" id="importLuaInput" accept=".lua" style="display: none;">
-        <button id="importLuaButton">Import Lua File</button>
+        <button id="exportLuaButton">Export</button>
     </div>
     <textarea id="exportLuaOutput" placeholder="Updated colors in Lua format will appear here..."></textarea>
 
@@ -217,13 +209,9 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Include Spectrum JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.js"></script>
-
-    <!-- Your JavaScript code -->
     <script>
         // Original color data (deep copy to preserve defaults)
         const defaultColorData = [
-            // [Your existing color data remains unchanged]
-            // ...
             { key: 'SPLASH', value: ['FE5F55', '009DFF'] },
             { key: 'MULT', value: 'FE5F55' },
             { key: 'CHIPS', value: '009dff' },
@@ -383,24 +371,253 @@
         // Store references to Spectrum instances
         const spectrumInstances = [];
 
-        // [Your existing JavaScript code remains unchanged, including all functions and event listeners]
-
         // Function to create color pickers using Spectrum
         function createColorPickers(dataArray, container, defaultDataArray) {
-            // [Function implementation remains the same]
-            // ...
+            const mainCategory = { key: 'Main', items: [] };
+            const levelsCategory = { key: 'Levels and Rarity', items: [] };
+            const categories = [];
+
+            dataArray.forEach((item, index) => {
+                const key = item.key;
+                const value = item.value;
+                const defaultItem = defaultDataArray ? defaultDataArray[index] : null;
+
+                if (key === 'RARITY' || key === 'HAND_LEVELS') {
+                    // Group RARITY and HAND_LEVELS under "Levels and Rarity"
+                    levelsCategory.items.push({
+                        key: key,
+                        value: value,
+                        dataArray: dataArray,
+                        dataIndex: index,
+                        defaultValue: defaultItem ? defaultItem.value : value
+                    });
+                } else if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object') {
+                    // Nested category
+                    categories.push({
+                        key: key,
+                        value: value,
+                        defaultValue: defaultItem ? defaultItem.value : []
+                    });
+                } else {
+                    // Unclassified color or array of colors
+                    mainCategory.items.push({
+                        key: key,
+                        value: value,
+                        dataArray: dataArray,
+                        dataIndex: index,
+                        defaultValue: defaultItem ? defaultItem.value : value
+                    });
+                }
+            });
+
+            // Display Main category if it has items
+            if (mainCategory.items.length > 0) {
+                createCategoryDiv(mainCategory, container);
+            }
+
+            // Display Levels and Rarity category if it has items
+            if (levelsCategory.items.length > 0) {
+                createCategoryDiv(levelsCategory, container);
+            }
+
+            // Now process other categories
+            categories.forEach(category => {
+                const defaultSubData = category.defaultValue;
+
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+
+                const categoryTitle = document.createElement('h2');
+                categoryTitle.textContent = category.key;
+                categoryDiv.appendChild(categoryTitle);
+
+                const colorGrid = document.createElement('div');
+                colorGrid.className = 'color-grid';
+
+                category.value.forEach((subItem, subIndex) => {
+                    const subKey = subItem.key;
+                    const subValue = subItem.value;
+                    const defaultSubItem = defaultSubData ? defaultSubData[subIndex] : null;
+
+                    if (Array.isArray(subValue) && (typeof subValue[0] === 'string' || typeof subValue[0] === 'number')) {
+                        // Array of colors
+                        const defaultArrayData = defaultSubItem ? defaultSubItem.value : [];
+                        subValue.forEach((colorValue, idx) => {
+                            const defaultColorValue = defaultArrayData[idx] || 'FFFFFF';
+                            createColorItem(colorValue, `${subKey}[${idx}]`, subValue, idx, colorGrid, defaultColorValue);
+                        });
+                    } else if (typeof subValue === 'string') {
+                        const defaultColorValue = defaultSubItem ? defaultSubItem.value || 'FFFFFF' : 'FFFFFF';
+                        createColorItem(subValue, subKey, category.value, subIndex, colorGrid, defaultColorValue);
+                    }
+                });
+
+                categoryDiv.appendChild(colorGrid);
+                container.appendChild(categoryDiv);
+            });
         }
 
-        // Function to create category divs
         function createCategoryDiv(categoryObj, container) {
-            // [Function implementation remains the same]
-            // ...
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'category';
+
+            const categoryTitle = document.createElement('h2');
+            categoryTitle.textContent = categoryObj.key;
+            categoryDiv.appendChild(categoryTitle);
+
+            const colorGrid = document.createElement('div');
+            colorGrid.className = 'color-grid';
+
+            categoryObj.items.forEach(item => {
+                if (Array.isArray(item.value) && (typeof item.value[0] === 'string' || typeof item.value[0] === 'number')) {
+                    // Array of colors
+                    const defaultArrayData = item.defaultValue || [];
+                    item.value.forEach((colorValue, idx) => {
+                        const defaultColorValue = defaultArrayData[idx] || 'FFFFFF';
+                        createColorItem(colorValue, `${item.key}[${idx}]`, item.value, idx, colorGrid, defaultColorValue);
+                    });
+                } else if (typeof item.value === 'string') {
+                    // Single color value
+                    const defaultColorValue = item.defaultValue || 'FFFFFF';
+                    createColorItem(item.value, item.key, item.dataArray, item.dataIndex, colorGrid, defaultColorValue);
+                }
+            });
+
+            categoryDiv.appendChild(colorGrid);
+            container.appendChild(categoryDiv);
         }
 
-        // Function to create individual color items
         function createColorItem(colorValue, displayName, parentDataArray, dataIndex, container, defaultColorValue) {
-            // [Function implementation remains the same]
-            // ...
+            // Provide a default value if defaultColorValue is undefined
+            defaultColorValue = defaultColorValue || 'FFFFFF';
+
+            const colorItem = document.createElement('div');
+            colorItem.className = 'color-item';
+
+            const colorName = document.createElement('div');
+            colorName.className = 'color-name';
+            colorName.textContent = displayName;
+            colorName.title = displayName; // Show full name on hover
+
+            const colorOriginal = document.createElement('div');
+            colorOriginal.className = 'color-original';
+            colorOriginal.style.backgroundColor = '#' + defaultColorValue.slice(0, 6);
+
+            const arrow = document.createElement('div');
+            arrow.className = 'arrow';
+            arrow.textContent = '→';
+
+            // Create an input for Spectrum
+            const colorInput = document.createElement('input');
+            colorInput.type = 'text';
+            colorInput.className = 'color-picker';
+
+            // Set initial value (including alpha)
+            let hexColor = colorValue.slice(0, 6).toUpperCase();
+            let alpha = colorValue.length >= 8 ? parseInt(colorValue.slice(6, 8), 16) / 255 : 1;
+
+            colorInput.value = '#' + colorValue.slice(0, 6);
+
+            const hexInput = document.createElement('input');
+            hexInput.type = 'text';
+            hexInput.value = colorValue.toUpperCase();
+            hexInput.className = 'hex-input';
+            hexInput.maxLength = 8;
+
+            // Reset Button
+            const resetButton = document.createElement('button');
+            resetButton.className = 'reset-button';
+            resetButton.title = 'Reset to Default';
+            resetButton.addEventListener('click', function() {
+                // Reset data
+                if (Array.isArray(parentDataArray)) {
+                    parentDataArray[dataIndex] = defaultColorValue;
+                } else {
+                    parentDataArray.value = defaultColorValue;
+                }
+                // Update Spectrum color picker
+                const defaultHexColor = defaultColorValue.slice(0, 6).toUpperCase();
+                const defaultAlpha = defaultColorValue.length >= 8 ? parseInt(defaultColorValue.slice(6, 8), 16) / 255 : 1;
+                const defaultColorString = '#' + defaultHexColor + (defaultAlpha < 1 ? defaultColorValue.slice(6, 8) : '');
+                $(colorInput).spectrum("set", defaultColorString);
+                // Update hex input
+                hexInput.value = defaultColorValue.toUpperCase();
+            });
+
+            // Append elements
+            colorItem.appendChild(colorName);
+
+            const controlsContainer = document.createElement('div');
+            controlsContainer.className = 'controls-container';
+
+            controlsContainer.appendChild(colorOriginal);
+            controlsContainer.appendChild(arrow);
+            controlsContainer.appendChild(colorInput);
+            controlsContainer.appendChild(hexInput);
+            controlsContainer.appendChild(resetButton);
+
+            colorItem.appendChild(controlsContainer);
+            container.appendChild(colorItem);
+
+            // Initialize Spectrum on the colorInput
+            const spectrumInstance = $(colorInput).spectrum({
+                color: '#' + hexColor + (alpha < 1 ? Math.round(alpha * 255).toString(16).padStart(2, '0') : ''),
+                showInput: false,
+                showInitial: false,
+                preferredFormat: "hex8",
+                showAlpha: true,
+                move: function(tinycolor) {
+                    const newHex8 = tinycolor.toHex8String().toUpperCase();
+                    hexInput.value = newHex8.slice(1);
+                },
+                change: function(tinycolor) {
+                    const newHex8 = tinycolor.toHex8String().toUpperCase();
+                    hexInput.value = newHex8.slice(1);
+                    updateParentData(newHex8.slice(1));
+                }
+            });
+
+            // Store reference for reset all functionality
+            spectrumInstances.push({
+                spectrumInstance: spectrumInstance,
+                colorInput: colorInput,
+                hexInput: hexInput,
+                parentDataArray: parentDataArray,
+                dataIndex: dataIndex,
+                defaultColorValue: defaultColorValue
+            });
+
+            // Update functions
+            function updateColor(newColor) {
+                if (/^[0-9A-Fa-f]{6,8}$/.test(newColor)) {
+                    let colorString = '#' + newColor;
+                    $(colorInput).spectrum("set", colorString);
+                    updateParentData(newColor.toUpperCase());
+                }
+            }
+
+            function updateParentData(newColor) {
+                if (Array.isArray(parentDataArray)) {
+                    parentDataArray[dataIndex] = newColor;
+                } else {
+                    parentDataArray.value = newColor;
+                }
+            }
+
+            hexInput.addEventListener('input', function() {
+                const newHex = hexInput.value.toUpperCase();
+                if (/^[0-9A-Fa-f]{6,8}$/.test(newHex)) {
+                    updateColor(newHex);
+                }
+            });
+
+            hexInput.addEventListener('blur', function() {
+                // Validate hex code on blur
+                if (!/^[0-9A-Fa-f]{6,8}$/.test(hexInput.value)) {
+                    const currentHex = Array.isArray(parentDataArray) ? parentDataArray[dataIndex] : parentDataArray.value;
+                    hexInput.value = currentHex.toUpperCase();
+                }
+            });
         }
 
         // Initialize the color pickers
@@ -409,122 +626,35 @@
 
         // Reset All functionality
         document.getElementById('resetAllButton').addEventListener('click', function() {
-            // [Event listener implementation remains the same]
-            // ...
+            if (confirm('Are you sure you want to reset all colors to their default values? This action cannot be undone.')) {
+                // Reset colorData to defaultColorData
+                colorData = JSON.parse(JSON.stringify(defaultColorData));
+
+                // Update all Spectrum instances and hex inputs
+                spectrumInstances.forEach(function(item) {
+                    // Update parent data
+                    item.defaultColorValue = item.defaultColorValue || 'FFFFFF';
+                    if (Array.isArray(item.parentDataArray)) {
+                        item.parentDataArray[item.dataIndex] = item.defaultColorValue;
+                    } else {
+                        item.parentDataArray.value = item.defaultColorValue;
+                    }
+                    // Update Spectrum color picker
+                    const defaultHexColor = item.defaultColorValue.slice(0, 6).toUpperCase();
+                    const defaultAlpha = item.defaultColorValue.length >= 8 ? parseInt(item.defaultColorValue.slice(6, 8), 16) / 255 : 1;
+                    const defaultColorString = '#' + defaultHexColor + (defaultAlpha < 1 ? item.defaultColorValue.slice(6, 8) : '');
+                    $(item.colorInput).spectrum("set", defaultColorString);
+                    // Update hex input
+                    item.hexInput.value = item.defaultColorValue.toUpperCase();
+                });
+            }
         });
 
         // Export to Lua functionality
         document.getElementById('exportLuaButton').addEventListener('click', function() {
-            const luaCode = 'return ' + convertToLuaTable(colorData);
-            document.getElementById('exportLuaOutput').value = luaCode;
-
-            // Trigger a download
-            const blob = new Blob([luaCode], { type: 'text/plain;charset=utf-8' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'colors.lua';
-            link.click();
+            const exportedLua = 'return ' + convertToLuaTable(colorData);
+            document.getElementById('exportLuaOutput').value = exportedLua;
         });
-
-        // Import Lua functionality
-        document.getElementById('importLuaButton').addEventListener('click', function() {
-            document.getElementById('importLuaInput').click();
-        });
-
-        document.getElementById('importLuaInput').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const luaCode = e.target.result;
-                    try {
-                        const parsedData = parseLuaCode(luaCode);
-                        // Update colorData
-                        colorData = parsedData;
-                        // Recreate the color pickers
-                        colorContainer.innerHTML = '';
-                        spectrumInstances.length = 0; // Clear existing instances
-                        createColorPickers(colorData, colorContainer, defaultColorData);
-                    } catch (error) {
-                        alert('Error parsing Lua file: ' + error.message);
-                    }
-                };
-                reader.readAsText(file);
-            }
-        });
-
-        // Function to parse the Lua code and extract color data
-        function parseLuaCode(luaCode) {
-            const ast = luaparse.parse(luaCode);
-            // Extract the return statement
-            if (ast.body.length > 0 && ast.body[0].type === 'ReturnStatement') {
-                const returnStatement = ast.body[0];
-                const argument = returnStatement.arguments[0];
-                // Now parse the argument, which should be a table constructor
-                const data = parseLuaTable(argument);
-                return data;
-            } else {
-                throw new Error('No return statement found in Lua code.');
-            }
-        }
-
-        function parseLuaTable(node) {
-            if (node.type !== 'TableConstructorExpression') {
-                throw new Error('Expected a table constructor.');
-            }
-
-            // Determine if the table is an array or an object
-            const isArray = node.fields.every(field => field.type === 'TableValue');
-
-            if (isArray) {
-                // It's an array
-                const result = [];
-                node.fields.forEach(field => {
-                    const valueNode = field.value;
-                    const value = parseLuaValue(valueNode);
-                    result.push(value);
-                });
-                return result;
-            } else {
-                // It's an object (table with key-value pairs)
-                const result = [];
-                node.fields.forEach(field => {
-                    if (field.type === 'TableKeyString') {
-                        const key = field.key.name;
-                        const valueNode = field.value;
-                        const value = parseLuaValue(valueNode);
-                        result.push({ key: key, value: value });
-                    } else {
-                        throw new Error('Unsupported table field type: ' + field.type);
-                    }
-                });
-                return result;
-            }
-        }
-
-        function parseLuaValue(node) {
-            if (node.type === 'StringLiteral') {
-                return node.value;
-            } else if (node.type === 'NumericLiteral') {
-                return node.value;
-            } else if (node.type === 'TableConstructorExpression') {
-                return parseLuaTable(node);
-            } else if (node.type === 'CallExpression') {
-                // Handle HEX('...') function calls
-                if (node.base.type === 'Identifier' && node.base.name === 'HEX') {
-                    const arg = node.arguments[0];
-                    if (arg.type === 'StringLiteral') {
-                        return arg.value;
-                    } else {
-                        throw new Error('HEX function argument must be a string literal.');
-                    }
-                } else {
-                    throw new Error('Unsupported function call: ' + node.base.name);
-                }
-            } else {
-                throw new Error('Unsupported node type: ' + node.type);
-            }
-        }
 
         // Function to convert the array-based color data to Lua table format
         function convertToLuaTable(dataArray, indent = '', isRoot = true) {
