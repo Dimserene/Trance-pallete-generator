@@ -624,49 +624,44 @@
         function createColorItem(colorValue, displayName, parentDataArray, dataIndex, container, defaultColorValue, comment = '') {
             // Provide a default value if defaultColorValue is undefined
             defaultColorValue = defaultColorValue || 'FFFFFF';
-
+        
             const colorItem = document.createElement('div');
             colorItem.className = 'color-item';
-
+        
             const colorName = document.createElement('div');
             colorName.className = 'color-name';
             colorName.textContent = displayName;
-
-            if (comment) {
-                const colorComment = document.createElement('div');
-                colorComment.className = 'color-comment';
-                colorComment.textContent = comment;
-                colorItem.appendChild(colorComment);
-            }
-
+        
+            colorItem.appendChild(colorName);
+        
             const controlsContainer = document.createElement('div');
             controlsContainer.className = 'controls-container';
-
+        
             const colorOriginal = document.createElement('div');
             colorOriginal.className = 'color-original';
             colorOriginal.style.backgroundColor = '#' + defaultColorValue.slice(0, 6);
-
+        
             const arrow = document.createElement('div');
             arrow.className = 'arrow';
             arrow.textContent = '→';
-
+        
             // Create an input for Spectrum
             const colorInput = document.createElement('input');
             colorInput.type = 'text';
             colorInput.className = 'color-picker';
-
+        
             // Set initial value (including alpha)
             let hexColor = colorValue.slice(0, 6).toUpperCase();
             let alpha = colorValue.length >= 8 ? parseInt(colorValue.slice(6, 8), 16) / 255 : 1;
-
+        
             colorInput.value = '#' + colorValue.slice(0, 6);
-
+        
             const hexInput = document.createElement('input');
             hexInput.type = 'text';
             hexInput.value = colorValue.toUpperCase();
             hexInput.className = 'hex-input';
             hexInput.maxLength = 8;
-
+        
             // Reset Button
             const resetButton = document.createElement('button');
             resetButton.className = 'reset-button';
@@ -686,19 +681,28 @@
                 // Update hex input
                 hexInput.value = defaultColorValue.toUpperCase();
             });
-
-            // Append elements
-            colorItem.appendChild(colorName);
-
+        
+            // Append elements to controlsContainer
             controlsContainer.appendChild(colorOriginal);
             controlsContainer.appendChild(arrow);
             controlsContainer.appendChild(colorInput);
             controlsContainer.appendChild(hexInput);
             controlsContainer.appendChild(resetButton);
-
+        
+            // Append controlsContainer to colorItem
             colorItem.appendChild(controlsContainer);
+        
+            // Now append the comment after the controlsContainer
+            if (comment) {
+                const colorComment = document.createElement('div');
+                colorComment.className = 'color-comment';
+                colorComment.textContent = comment;
+                colorItem.appendChild(colorComment);
+            }
+        
+            // Append the colorItem to the container
             container.appendChild(colorItem);
-
+        
             // Initialize Spectrum on the colorInput
             const spectrumInstance = $(colorInput).spectrum({
                 color: '#' + hexColor + (alpha < 1 ? Math.round(alpha * 255).toString(16).padStart(2, '0') : ''),
@@ -716,7 +720,7 @@
                     updateParentData(newHex8.slice(1));
                 }
             });
-
+        
             // Store reference for reset all functionality
             spectrumInstances.push({
                 spectrumInstance: spectrumInstance,
@@ -726,7 +730,7 @@
                 dataIndex: dataIndex,
                 defaultColorValue: defaultColorValue
             });
-
+        
             // Update functions
             function updateColor(newColor) {
                 if (/^[0-9A-Fa-f]{6,8}$/.test(newColor)) {
@@ -735,7 +739,7 @@
                     updateParentData(newColor.toUpperCase());
                 }
             }
-
+        
             function updateParentData(newColor) {
                 if (Array.isArray(parentDataArray)) {
                     parentDataArray[dataIndex] = newColor;
@@ -743,14 +747,14 @@
                     parentDataArray.value = newColor;
                 }
             }
-
+        
             hexInput.addEventListener('input', function() {
                 const newHex = hexInput.value.toUpperCase();
                 if (/^[0-9A-Fa-f]{6,8}$/.test(newHex)) {
                     updateColor(newHex);
                 }
             });
-
+        
             hexInput.addEventListener('blur', function() {
                 // Validate hex code on blur
                 if (!/^[0-9A-Fa-f]{6,8}$/.test(hexInput.value)) {
