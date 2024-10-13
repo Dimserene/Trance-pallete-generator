@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Trance Palette Generator v1.3</title>
+    <title>Trance Palette Generator v1.4</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Mobile friendly -->
     <!-- Include Spectrum CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css">
@@ -191,7 +191,7 @@
 </head>
 <body>
 
-    <h1>Trance Palette Generator v1.3</h1>
+    <h1>Trance Palette Generator v1.4</h1>
 
     <div id="colorContainer"></div>
 
@@ -206,12 +206,15 @@
     <!-- Include Spectrum JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.js"></script>
     <script>
-        // Updated color data with comments and original color codes
+        // Updated color data with individual comments for array items
         const defaultColorData = [
             {
                 key: 'SPLASH',
-                value: ['FE5F55', '009DFF'],
-                comment: ['Affects Title Screen / Boss Screen colors', 'Affects Title Screen / Boss Screen colors']
+                value: [
+                    { value: 'FE5F55', comment: 'Splash Color 1' },
+                    { value: '009DFF', comment: 'Splash Color 2' }
+                ],
+                comment: 'Title Screen / Boss Screen colors'
             },
             {
                 key: 'MULT',
@@ -226,7 +229,7 @@
             {
                 key: 'PLASMA',
                 value: 'CC73D9',
-                comment: 'Color of both halves when score is \'Balanced\' by Plasma Deck'
+                comment: 'Color of both halves when score is balanced by Plasma Deck'
             },
             {
                 key: 'MONEY',
@@ -241,17 +244,17 @@
             {
                 key: 'FILTER',
                 value: 'FF9A00',
-                comment: 'See IMPORTANT'
+                comment: 'Used for important elements like filters'
             },
             {
                 key: 'BLUE',
                 value: '009DFF',
-                comment: 'See CHIPS'
+                comment: 'Color for Blue chips'
             },
             {
                 key: 'RED',
                 value: 'FE5F55',
-                comment: 'See MULT'
+                comment: 'Color for Red chips'
             },
             {
                 key: 'GREEN',
@@ -281,214 +284,227 @@
             {
                 key: 'YELLOW',
                 value: 'FFFF00',
-                comment: 'General yellow'
+                comment: 'General yellow color'
             },
             {
                 key: 'CLEAR',
                 value: '00000000',
-                comment: 'An exactly clear color (e.g., glass cards)'
+                comment: 'Transparent color (e.g. glass cards)'
             },
             {
                 key: 'WHITE',
                 value: 'FFFFFF',
-                comment: 'Exactly white, can mess up shaders if changed'
+                comment: 'Pure white color, used in important highlights'
             },
             {
                 key: 'PURPLE',
                 value: '8867A5',
-                comment: 'Color for "Tarot Card" when mentioned'
+                comment: 'Color for Tarot cards'
             },
             {
                 key: 'BLACK',
                 value: '374244',
-                comment: 'Black'
+                comment: 'Black color'
             },
             {
                 key: 'L_BLACK',
                 value: '4F6367',
-                comment: 'Light Black'
+                comment: 'Light black color'
             },
             {
                 key: 'GREY',
                 value: '5F7377',
-                comment: 'Grey'
+                comment: 'Grey color'
             },
             {
                 key: 'CHANCE',
                 value: '4BC292',
-                comment: 'Probability Color'
+                comment: 'Probability color'
             },
             {
                 key: 'JOKER_GREY',
                 value: 'BFC7D5',
-                comment: 'Joker Grey (text color)'
+                comment: 'Grey color for Joker text'
             },
             {
                 key: 'VOUCHER',
                 value: 'CB724C',
-                comment: 'Background for "Voucher" text'
+                comment: 'Background for Voucher text'
             },
             {
                 key: 'BOOSTER',
                 value: '646EB7',
-                comment: 'Background for "Booster" text'
+                comment: 'Background for Booster text'
             },
             {
                 key: 'ETERNAL',
                 value: 'C75985',
-                comment: 'Background for "Eternal" text'
+                comment: 'Background for Eternal text'
             },
             {
                 key: 'PERISHABLE',
                 value: '4F5DA1',
-                comment: 'Background for "Perishable" text'
+                comment: 'Background for Perishable text'
             },
             {
                 key: 'RENTAL',
                 value: 'B18F43',
-                comment: 'Background for "Rental" text'
+                comment: 'Background for Rental text'
             },
             {
                 key: 'DYN_UI',
                 value: [
-                    { key: 'MAIN', value: '374244', comment: '' },
-                    { key: 'DARK', value: '374244', comment: '' },
-                    { key: 'BOSS_MAIN', value: '374244', comment: '' },
-                    { key: 'BOSS_DARK', value: '374244', comment: '' },
-                    { key: 'BOSS_PALE', value: '374244', comment: '' }
+                    { key: 'MAIN', value: '374244', comment: 'Dynamic UI main color' },
+                    { key: 'DARK', value: '374244', comment: 'Dynamic UI dark color' },
+                    { key: 'BOSS_MAIN', value: '374244', comment: 'Boss UI main color' },
+                    { key: 'BOSS_DARK', value: '374244', comment: 'Boss UI dark color' },
+                    { key: 'BOSS_PALE', value: '374244', comment: 'Boss UI pale color' }
                 ],
-                comment: ''
+                comment: 'Colors for dynamic UI elements'
             },
             {
                 key: 'SO_1',
                 value: [
-                    { key: 'Hearts', value: 'F03464', comment: 'High Contrast Heart Suit Colors (when mentioned)' },
-                    { key: 'Diamonds', value: 'F06B3F', comment: 'High Contrast Diamonds Suit Colors (when mentioned)' },
-                    { key: 'Spades', value: '403995', comment: 'High Contrast Spades Suit Colors (when mentioned)' },
-                    { key: 'Clubs', value: '235955', comment: 'High Contrast Clubs Suit Colors (when mentioned)' }
+                    { key: 'Hearts', value: 'F03464', comment: 'High contrast Hearts suit' },
+                    { key: 'Diamonds', value: 'F06B3F', comment: 'High contrast Diamonds suit' },
+                    { key: 'Spades', value: '403995', comment: 'High contrast Spades suit' },
+                    { key: 'Clubs', value: '235955', comment: 'High contrast Clubs suit' }
                 ],
-                comment: 'High Contrast Suit Colors (when mentioned)'
+                comment: 'High contrast suit colors'
             },
             {
                 key: 'SO_2',
                 value: [
-                    { key: 'Hearts', value: 'F83B2F', comment: 'Normal Hearts suit colors (when mentioned)' },
-                    { key: 'Diamonds', value: 'E29000', comment: 'Normal Diamonds suit colors (when mentioned)' },
-                    { key: 'Spades', value: '4F31B9', comment: 'Normal Spades suit colors (when mentioned)' },
-                    { key: 'Clubs', value: '008EE6', comment: 'Normal Clubs suit colors (when mentioned)' }
+                    { key: 'Hearts', value: 'F83B2F', comment: 'Normal Hearts suit' },
+                    { key: 'Diamonds', value: 'E29000', comment: 'Normal Diamonds suit' },
+                    { key: 'Spades', value: '4F31B9', comment: 'Normal Spades suit' },
+                    { key: 'Clubs', value: '008EE6', comment: 'Normal Clubs suit' }
                 ],
-                comment: 'Normal suit colors (when mentioned)'
+                comment: 'Normal suit colors'
             },
             {
                 key: 'UI',
                 value: [
-                    { key: 'TEXT_LIGHT', value: 'FFFFFF', comment: '' },
-                    { key: 'TEXT_DARK', value: '4F6367', comment: '' },
-                    { key: 'TEXT_INACTIVE', value: '88888899', comment: '' },
-                    { key: 'BACKGROUND_LIGHT', value: 'B8D8D8', comment: '' },
-                    { key: 'BACKGROUND_WHITE', value: 'FFFFFF', comment: '' },
-                    { key: 'BACKGROUND_DARK', value: '7A9E9F', comment: '' },
-                    { key: 'BACKGROUND_INACTIVE', value: '666666FF', comment: '' },
-                    { key: 'OUTLINE_LIGHT', value: 'D8D8D8', comment: '' },
-                    { key: 'OUTLINE_LIGHT_TRANS', value: 'D8D8D866', comment: '' },
-                    { key: 'OUTLINE_DARK', value: '7A9E9F', comment: '' },
-                    { key: 'TRANSPARENT_LIGHT', value: 'EEEEEE22', comment: '' },
-                    { key: 'TRANSPARENT_DARK', value: '22222222', comment: '' },
-                    { key: 'HOVER', value: '00000055', comment: '' }
+                    { key: 'TEXT_LIGHT', value: 'FFFFFF', comment: 'Light text' },
+                    { key: 'TEXT_DARK', value: '4F6367', comment: 'Dark text' },
+                    { key: 'TEXT_INACTIVE', value: '88888899', comment: 'Inactive text' },
+                    { key: 'BACKGROUND_LIGHT', value: 'B8D8D8', comment: 'Light background' },
+                    { key: 'BACKGROUND_WHITE', value: 'FFFFFF', comment: 'White background' },
+                    { key: 'BACKGROUND_DARK', value: '7A9E9F', comment: 'Dark background' },
+                    { key: 'BACKGROUND_INACTIVE', value: '666666FF', comment: 'Inactive background' },
+                    { key: 'OUTLINE_LIGHT', value: 'D8D8D8', comment: 'Light outline' },
+                    { key: 'OUTLINE_LIGHT_TRANS', value: 'D8D8D866', comment: 'Light translucent outline' },
+                    { key: 'OUTLINE_DARK', value: '7A9E9F', comment: 'Dark outline' },
+                    { key: 'TRANSPARENT_LIGHT', value: 'EEEEEE22', comment: 'Light transparency' },
+                    { key: 'TRANSPARENT_DARK', value: '22222222', comment: 'Dark transparency' },
+                    { key: 'HOVER', value: '00000055', comment: 'Hover color' }
                 ],
-                comment: 'UI texts'
+                comment: 'UI Text and Background Colors'
             },
             {
                 key: 'SET',
                 value: [
-                    { key: 'Default', value: 'CDD9DC', comment: '' },
-                    { key: 'Enhanced', value: 'CDD9DC', comment: '' },
-                    { key: 'Joker', value: '424E54', comment: '' },
-                    { key: 'Tarot', value: '424E54', comment: '' },
-                    { key: 'Planet', value: '424E54', comment: '' },
-                    { key: 'Spectral', value: '424E54', comment: '' },
-                    { key: 'Voucher', value: '424E54', comment: '' }
+                    { value: 'CDD9DC', comment: 'Default set color' },
+                    { value: 'CDD9DC', comment: 'Enhanced set color' },
+                    { value: '424E54', comment: 'Joker set color' },
+                    { value: '424E54', comment: 'Tarot set color' },
+                    { value: '424E54', comment: 'Planet set color' },
+                    { value: '424E54', comment: 'Spectral set color' },
+                    { value: '424E54', comment: 'Voucher set color' }
                 ],
-                comment: 'Backgrounds for certain types of cards'
+                comment: 'Background colors for card sets'
             },
             {
                 key: 'SECONDARY_SET',
                 value: [
-                    { key: 'Default', value: '9BB6BDFF', comment: '' },
-                    { key: 'Enhanced', value: '8389DDFF', comment: '' },
-                    { key: 'Joker', value: '708B91', comment: '' },
-                    { key: 'Tarot', value: 'A782D1', comment: '' },
-                    { key: 'Planet', value: '13AFCE', comment: '' },
-                    { key: 'Spectral', value: '4584FA', comment: '' },
-                    { key: 'Voucher', value: 'FD682B', comment: '' },
-                    { key: 'Edition', value: '4CA893', comment: '' }
+                    { value: '9BB6BDFF', comment: 'Default secondary color' },
+                    { value: '8389DDFF', comment: 'Enhanced secondary color' },
+                    { value: '708B91', comment: 'Joker secondary color' },
+                    { value: 'A782D1', comment: 'Tarot secondary color' },
+                    { value: '13AFCE', comment: 'Planet secondary color' },
+                    { value: '4584FA', comment: 'Spectral secondary color' },
+                    { value: 'FD682B', comment: 'Voucher secondary color' },
+                    { value: '4CA893', comment: 'Edition secondary color' }
                 ],
-                comment: 'Backgrounds for certain types of cards'
+                comment: 'Secondary background colors for certain cards'
             },
             {
                 key: 'RARITY',
-                value: ['009DFF', '4BC292', 'FE5F55', 'B26CBB'],
-                comment: ['Common', 'Uncommon', 'Rare', 'Legendary']
+                value: [
+                    { value: '009DFF', comment: 'Common' },
+                    { value: '4BC292', comment: 'Uncommon' },
+                    { value: 'FE5F55', comment: 'Rare' },
+                    { value: 'B26CBB', comment: 'Legendary' }
+                ],
+                comment: 'Rarity colors'
             },
             {
                 key: 'BLIND',
                 value: [
-                    { key: 'Small', value: '50846E', comment: '' },
-                    { key: 'Big', value: '50846E', comment: '' },
-                    { key: 'Boss', value: 'B44430', comment: '' },
-                    { key: 'won', value: '4F6367', comment: '' }
+                    { key: 'Small', value: '50846E', comment: 'Small blind color' },
+                    { key: 'Big', value: '50846E', comment: 'Big blind color' },
+                    { key: 'Boss', value: 'B44430', comment: 'Boss blind color' },
+                    { key: 'won', value: '4F6367', comment: 'Blind won color' }
                 ],
-                comment: ''
+                comment: 'Blind colors'
             },
             {
                 key: 'HAND_LEVELS',
-                value: ['EFEFEF', '95ACFF', '65EFAF', 'FAE37E', 'FFC052', 'F87D75', 'CAA0EF'],
-                comment: ['Lvl 1', 'Lvl 2', 'Lvl 3', 'Lvl 4', 'Lvl 5', 'Lvl 6', 'Lvl 7+']
+                value: [
+                    { value: 'EFEFEF', comment: 'Hand Level 1' },
+                    { value: '95ACFF', comment: 'Hand Level 2' },
+                    { value: '65EFAF', comment: 'Hand Level 3' },
+                    { value: 'FAE37E', comment: 'Hand Level 4' },
+                    { value: 'FFC052', comment: 'Hand Level 5' },
+                    { value: 'F87D75', comment: 'Hand Level 6' },
+                    { value: 'CAA0EF', comment: 'Hand Level 7+' }
+                ],
+                comment: 'Hand level progression colors'
             },
             {
                 key: 'BACKGROUND',
                 value: [
-                    { key: 'L', value: 'FFFF00', comment: '' },
-                    { key: 'D', value: '374244', comment: '' },
-                    { key: 'C', value: '374244', comment: '' }
+                    { key: 'L', value: 'FFFF00', comment: 'Background Light' },
+                    { key: 'D', value: '374244', comment: 'Background Dark' },
+                    { key: 'C', value: '374244', comment: 'Background Contrast' }
                 ],
-                comment: ''
+                comment: 'Background colors'
             },
             {
                 key: 'BOSSES',
                 value: [
-                    { key: 'bl_ox', value: 'B95B08', comment: '' },
-                    { key: 'bl_hook', value: 'A84024', comment: '' },
-                    { key: 'bl_mouth', value: 'AE718E', comment: '' },
-                    { key: 'bl_fish', value: '3E85BD', comment: '' },
-                    { key: 'bl_club', value: 'B9CB92', comment: '' },
-                    { key: 'bl_manacle', value: '575757', comment: '' },
-                    { key: 'bl_tooth', value: 'B52D2D', comment: '' },
-                    { key: 'bl_wall', value: '8A59A5', comment: '' },
-                    { key: 'bl_house', value: '5186A8', comment: '' },
-                    { key: 'bl_mark', value: '6A3847', comment: '' },
-                    { key: 'bl_wheel', value: '50BF7C', comment: '' },
-                    { key: 'bl_arm', value: '6865F3', comment: '' },
-                    { key: 'bl_psychic', value: 'EFC03C', comment: '' },
-                    { key: 'bl_goad', value: 'B95C96', comment: '' },
-                    { key: 'bl_water', value: 'C6E0EB', comment: '' },
-                    { key: 'bl_eye', value: '4B71E4', comment: '' },
-                    { key: 'bl_plant', value: '709284', comment: '' },
-                    { key: 'bl_needle', value: '5C6E31', comment: '' },
-                    { key: 'bl_head', value: 'AC9DB4', comment: '' },
-                    { key: 'bl_window', value: 'A9A295', comment: '' },
-                    { key: 'bl_serpent', value: '439A4F', comment: '' },
-                    { key: 'bl_pillar', value: '7E6752', comment: '' },
-                    { key: 'bl_flint', value: 'E56A2F', comment: '' },
-                    { key: 'bl_final_bell', value: '009CFD', comment: 'Cerulean Bell' },
-                    { key: 'bl_final_leaf', value: '56A786', comment: 'Verdant Leaf' },
-                    { key: 'bl_final_vessel', value: '8A71E1', comment: 'Violet Vessel' },
-                    { key: 'bl_final_acorn', value: 'FDA200', comment: 'Amber Acorn' },
-                    { key: 'bl_final_heart', value: 'AC3232', comment: 'Crimson Heart' }
+                    { key: 'bl_ox', value: 'B95B08', comment: 'Boss color for The Ox' },
+                    { key: 'bl_hook', value: 'A84024', comment: 'Boss color for The Hook' },
+                    { key: 'bl_mouth', value: 'AE718E', comment: 'Boss color for The Mouth' },
+                    { key: 'bl_fish', value: '3E85BD', comment: 'Boss color for The Fish' },
+                    { key: 'bl_club', value: 'B9CB92', comment: 'Boss color for The Club' },
+                    { key: 'bl_manacle', value: '575757', comment: 'Boss color for The Manacle' },
+                    { key: 'bl_tooth', value: 'B52D2D', comment: 'Boss color for The Tooth' },
+                    { key: 'bl_wall', value: '8A59A5', comment: 'Boss color for The Wall' },
+                    { key: 'bl_house', value: '5186A8', comment: 'Boss color for The House' },
+                    { key: 'bl_mark', value: '6A3847', comment: 'Boss color for The Mark' },
+                    { key: 'bl_wheel', value: '50BF7C', comment: 'Boss color for The Wheel' },
+                    { key: 'bl_arm', value: '6865F3', comment: 'Boss color for The Arm' },
+                    { key: 'bl_psychic', value: 'EFC03C', comment: 'Boss color for The Psychic' },
+                    { key: 'bl_goad', value: 'B95C96', comment: 'Boss color for The Goad' },
+                    { key: 'bl_water', value: 'C6E0EB', comment: 'Boss color for The Water' },
+                    { key: 'bl_eye', value: '4B71E4', comment: 'Boss color for The Eye' },
+                    { key: 'bl_plant', value: '709284', comment: 'Boss color for The Plant' },
+                    { key: 'bl_needle', value: '5C6E31', comment: 'Boss color for The Needle' },
+                    { key: 'bl_head', value: 'AC9DB4', comment: 'Boss color for The Head' },
+                    { key: 'bl_window', value: 'A9A295', comment: 'Boss color for The Window' },
+                    { key: 'bl_serpent', value: '439A4F', comment: 'Boss color for The Serpent' },
+                    { key: 'bl_pillar', value: '7E6752', comment: 'Boss color for The Pillar' },
+                    { key: 'bl_flint', value: 'E56A2F', comment: 'Boss color for The Flint' },
+                    { key: 'bl_final_bell', value: '009CFD', comment: 'Boss color for Cerulean Bell' },
+                    { key: 'bl_final_leaf', value: '56A786', comment: 'Boss color for Verdant Leaf' },
+                    { key: 'bl_final_vessel', value: '8A71E1', comment: 'Boss color for Violet Vessel' },
+                    { key: 'bl_final_acorn', value: 'FDA200', comment: 'Boss color for Amber Acorn' },
+                    { key: 'bl_final_heart', value: 'AC3232', comment: 'Boss color for Crimson Heart' }
                 ],
-                comment: 'Boss Colors (does not affect background)'
+                comment: 'Boss-specific colors'
             }
-        ]; 
+        ];
 
         // Copy of color data that will be modified
         let colorData = JSON.parse(JSON.stringify(defaultColorData));
@@ -498,26 +514,85 @@
 
         // Function to create color pickers using Spectrum
         function createColorPickers(dataArray, container, defaultDataArray) {
+            const mainCategory = { key: 'Main', items: [] };
+            const levelsCategory = { key: 'Levels and Rarity', items: [] };
+            const categories = [];
+
             dataArray.forEach((item, index) => {
                 const key = item.key;
                 const value = item.value;
-                const comments = item.comments || []; // Get comments for each item
-        
-                // Check if the value is an array of colors
-                if (Array.isArray(value)) {
-                    value.forEach((color, idx) => {
-                        const displayName = `${key}[${idx}]`;  // e.g., SPLASH[0], SPLASH[1]
-                        const comment = comments[idx] || '';   // Get the corresponding comment for each color
-                        const defaultColor = defaultDataArray[index].value[idx]; // Default color value
-        
-                        createColorItem(color, displayName, value, idx, container, defaultColor, comment);
+                const comment = item.comment || '';
+                const defaultItem = defaultDataArray ? defaultDataArray[index] : null;
+
+                if (key === 'RARITY' || key === 'HAND_LEVELS') {
+                    // Group RARITY and HAND_LEVELS under "Levels and Rarity"
+                    levelsCategory.items.push({
+                        key: key,
+                        value: value,
+                        comment: comment,
+                        dataArray: dataArray,
+                        dataIndex: index,
+                        defaultValue: defaultItem ? defaultItem.value : value
+                    });
+                } else if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object' && value[0].hasOwnProperty('value')) {
+                    // Nested category with array of objects
+                    categories.push({
+                        key: key,
+                        value: value,
+                        comment: comment,
+                        defaultValue: defaultItem ? defaultItem.value : []
                     });
                 } else {
-                    // For single color items (non-array)
-                    const comment = item.comment || ''; // Handle comment for single color items
-                    const defaultColor = defaultDataArray[index].value;
-                    createColorItem(value, key, dataArray, index, container, defaultColor, comment);
+                    // Unclassified color or array of colors
+                    mainCategory.items.push({
+                        key: key,
+                        value: value,
+                        comment: comment,
+                        dataArray: dataArray,
+                        dataIndex: index,
+                        defaultValue: defaultItem ? defaultItem.value : value
+                    });
                 }
+            });
+
+            // Display Main category if it has items
+            if (mainCategory.items.length > 0) {
+                createCategoryDiv(mainCategory, container);
+            }
+
+            // Display Levels and Rarity category if it has items
+            if (levelsCategory.items.length > 0) {
+                createCategoryDiv(levelsCategory, container);
+            }
+
+            // Now process other categories
+            categories.forEach(category => {
+                const defaultSubData = category.defaultValue;
+
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+
+                const categoryTitle = document.createElement('h2');
+                categoryTitle.textContent = category.key;
+                categoryDiv.appendChild(categoryTitle);
+
+                const colorGrid = document.createElement('div');
+                colorGrid.className = 'color-grid';
+
+                category.value.forEach((subItem, subIndex) => {
+                    const subKey = subItem.key || `${category.key}[${subIndex}]`;
+                    const subValue = subItem.value;
+                    const subComment = subItem.comment || '';
+                    const defaultSubItem = defaultSubData ? defaultSubData[subIndex] : null;
+
+                    if (typeof subValue === 'string') {
+                        const defaultColorValue = defaultSubItem ? defaultSubItem.value || 'FFFFFF' : 'FFFFFF';
+                        createColorItem(subValue, subKey, category.value, subIndex, colorGrid, defaultColorValue, subComment);
+                    }
+                });
+
+                categoryDiv.appendChild(colorGrid);
+                container.appendChild(categoryDiv);
             });
         }
 
@@ -533,13 +608,15 @@
             colorGrid.className = 'color-grid';
 
             categoryObj.items.forEach(item => {
-                if (Array.isArray(item.value) && (typeof item.value[0] === 'string' || typeof item.value[0] === 'number')) {
-                    // Array of colors
+                if (Array.isArray(item.value) && item.value.length > 0 && typeof item.value[0] === 'object' && item.value[0].hasOwnProperty('value')) {
+                    // Array of objects with value and comment
                     const defaultArrayData = item.defaultValue || [];
-                    item.value.forEach((colorValue, idx) => {
-                        const defaultColorValue = defaultArrayData[idx] || 'FFFFFF';
-                        const subComment = item.subComments ? item.subComments[idx] : '';
-                        createColorItem(colorValue, `${item.key}[${idx}]`, item.value, idx, colorGrid, defaultColorValue, subComment);
+                    item.value.forEach((colorItem, idx) => {
+                        const colorValue = colorItem.value;
+                        const subComment = colorItem.comment || '';
+                        const defaultColorValue = defaultArrayData[idx] ? defaultArrayData[idx].value || 'FFFFFF' : 'FFFFFF';
+                        const displayName = `${item.key}[${idx}]`;
+                        createColorItem(colorValue, displayName, item.value, idx, colorGrid, defaultColorValue, subComment);
                     });
                 } else if (typeof item.value === 'string') {
                     // Single color value
@@ -553,71 +630,105 @@
         }
 
         function createColorItem(colorValue, displayName, parentDataArray, dataIndex, container, defaultColorValue, comment = '') {
-            // Create the color item as usual (colorName, colorPicker, etc.)
+            // Provide a default value if defaultColorValue is undefined
+            defaultColorValue = defaultColorValue || 'FFFFFF';
+
             const colorItem = document.createElement('div');
             colorItem.className = 'color-item';
-        
+
             const colorName = document.createElement('div');
             colorName.className = 'color-name';
             colorName.textContent = displayName;
-        
-            // Append the color name to the item
+
             colorItem.appendChild(colorName);
-        
+
             const controlsContainer = document.createElement('div');
             controlsContainer.className = 'controls-container';
-        
+
             const colorOriginal = document.createElement('div');
             colorOriginal.className = 'color-original';
             colorOriginal.style.backgroundColor = '#' + defaultColorValue.slice(0, 6);
-        
+
             const arrow = document.createElement('div');
             arrow.className = 'arrow';
             arrow.textContent = '→';
-        
+
+            // Create an input for Spectrum
             const colorInput = document.createElement('input');
             colorInput.type = 'text';
             colorInput.className = 'color-picker';
+
+            // Set initial value (including alpha)
+            let hexColor = colorValue.slice(0, 6).toUpperCase();
+            let alpha = colorValue.length >= 8 ? parseInt(colorValue.slice(6, 8), 16) / 255 : 1;
+
             colorInput.value = '#' + colorValue.slice(0, 6);
-        
+
             const hexInput = document.createElement('input');
             hexInput.type = 'text';
             hexInput.value = colorValue.toUpperCase();
             hexInput.className = 'hex-input';
             hexInput.maxLength = 8;
-        
+
+            // Reset Button
             const resetButton = document.createElement('button');
             resetButton.className = 'reset-button';
             resetButton.title = 'Reset to Default';
-        
-            // Append controls
+            resetButton.addEventListener('click', function() {
+                // Reset data
+                if (Array.isArray(parentDataArray)) {
+                    parentDataArray[dataIndex].value = defaultColorValue;
+                } else {
+                    parentDataArray.value = defaultColorValue;
+                }
+                // Update Spectrum color picker
+                const defaultHexColor = defaultColorValue.slice(0, 6).toUpperCase();
+                const defaultAlpha = defaultColorValue.length >= 8 ? parseInt(defaultColorValue.slice(6, 8), 16) / 255 : 1;
+                const defaultColorString = '#' + defaultHexColor + (defaultAlpha < 1 ? defaultColorValue.slice(6, 8) : '');
+                $(colorInput).spectrum("set", defaultColorString);
+                // Update hex input
+                hexInput.value = defaultColorValue.toUpperCase();
+            });
+
+            // Append elements to controlsContainer
             controlsContainer.appendChild(colorOriginal);
             controlsContainer.appendChild(arrow);
             controlsContainer.appendChild(colorInput);
             controlsContainer.appendChild(hexInput);
             controlsContainer.appendChild(resetButton);
+
+            // Append controlsContainer to colorItem
             colorItem.appendChild(controlsContainer);
-        
-            // Now append the individual comment below the color picker
+
+            // Now append the comment after the controlsContainer
             if (comment) {
                 const colorComment = document.createElement('div');
                 colorComment.className = 'color-comment';
-                colorComment.textContent = comment; // Add individual comment
+                colorComment.textContent = comment;
                 colorItem.appendChild(colorComment);
             }
-        
+
+            // Append the colorItem to the container
             container.appendChild(colorItem);
-        
-            // Initialize Spectrum picker and handle events (color change, reset, etc.)
+
+            // Initialize Spectrum on the colorInput
             const spectrumInstance = $(colorInput).spectrum({
-                color: '#' + colorValue.slice(0, 6),
+                color: '#' + hexColor + (alpha < 1 ? Math.round(alpha * 255).toString(16).padStart(2, '0') : ''),
+                showInput: false,
+                showInitial: false,
+                preferredFormat: "hex8",
                 showAlpha: true,
+                move: function(tinycolor) {
+                    const newHex8 = tinycolor.toHex8String().toUpperCase();
+                    hexInput.value = newHex8.slice(1);
+                },
                 change: function(tinycolor) {
-                    parentDataArray[dataIndex] = tinycolor.toHexString().toUpperCase().slice(1);
+                    const newHex8 = tinycolor.toHex8String().toUpperCase();
+                    hexInput.value = newHex8.slice(1);
+                    updateParentData(newHex8.slice(1));
                 }
             });
-        }
-        
+
             // Store reference for reset all functionality
             spectrumInstances.push({
                 spectrumInstance: spectrumInstance,
@@ -627,7 +738,7 @@
                 dataIndex: dataIndex,
                 defaultColorValue: defaultColorValue
             });
-        
+
             // Update functions
             function updateColor(newColor) {
                 if (/^[0-9A-Fa-f]{6,8}$/.test(newColor)) {
@@ -636,26 +747,26 @@
                     updateParentData(newColor.toUpperCase());
                 }
             }
-        
+
             function updateParentData(newColor) {
                 if (Array.isArray(parentDataArray)) {
-                    parentDataArray[dataIndex] = newColor;
+                    parentDataArray[dataIndex].value = newColor;
                 } else {
                     parentDataArray.value = newColor;
                 }
             }
-        
+
             hexInput.addEventListener('input', function() {
                 const newHex = hexInput.value.toUpperCase();
                 if (/^[0-9A-Fa-f]{6,8}$/.test(newHex)) {
                     updateColor(newHex);
                 }
             });
-        
+
             hexInput.addEventListener('blur', function() {
                 // Validate hex code on blur
                 if (!/^[0-9A-Fa-f]{6,8}$/.test(hexInput.value)) {
-                    const currentHex = Array.isArray(parentDataArray) ? parentDataArray[dataIndex] : parentDataArray.value;
+                    const currentHex = Array.isArray(parentDataArray) ? parentDataArray[dataIndex].value : parentDataArray.value;
                     hexInput.value = currentHex.toUpperCase();
                 }
             });
@@ -676,7 +787,7 @@
                     // Update parent data
                     item.defaultColorValue = item.defaultColorValue || 'FFFFFF';
                     if (Array.isArray(item.parentDataArray)) {
-                        item.parentDataArray[item.dataIndex] = item.defaultColorValue;
+                        item.parentDataArray[item.dataIndex].value = item.defaultColorValue;
                     } else {
                         item.parentDataArray.value = item.defaultColorValue;
                     }
@@ -711,13 +822,15 @@
                     lua += '["' + key + '"] = ';
                 }
                 if (Array.isArray(value)) {
-                    if (value.length > 0 && typeof value[0] === 'object') {
-                        lua += convertToLuaTable(value, indent2, false) + ',\n';
-                    } else if (value.length > 0 && (typeof value[0] === 'string' || typeof value[0] === 'number')) {
-                        // Array of colors
+                    if (value.length > 0 && typeof value[0] === 'object' && value[0].hasOwnProperty('value')) {
+                        // Array of objects with value and comment
                         lua += '{\n';
                         value.forEach(function(val) {
-                            lua += indent2 + '    HEX(\'' + val + '\'),\n';
+                            if (val.key) {
+                                lua += indent2 + '    ' + val.key + ' = HEX(\'' + val.value + '\'),\n';
+                            } else {
+                                lua += indent2 + '    HEX(\'' + val.value + '\'),\n';
+                            }
                         });
                         lua += indent2 + '},\n';
                     } else {
