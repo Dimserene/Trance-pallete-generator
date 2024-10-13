@@ -867,15 +867,15 @@
                         // Array of objects with value and comment
                         lua += '{\n';
                         value.forEach(function(val) {
+                            lua += indent2 + '    ';
                             if (val.key) {
-                                lua += indent2 + '    ';
                                 if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(val.key)) {
                                     lua += val.key + ' = HEX(\'' + val.value + '\'),\n';
                                 } else {
                                     lua += '["' + val.key + '"] = HEX(\'' + val.value + '\'),\n';
                                 }
                             } else {
-                                lua += indent2 + '    HEX(\'' + val.value + '\'),\n';
+                                lua += 'HEX(\'' + val.value + '\'),\n';
                             }
                         });
                         lua += indent2 + '},\n';
