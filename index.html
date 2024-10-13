@@ -206,31 +206,31 @@
     <!-- Include Spectrum JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.js"></script>
     <script>
-        // Updated color data with comments
+        // Updated color data with comments and original color codes
         const defaultColorData = [
             {
                 key: 'SPLASH',
-                value: ['b494bc', 'af84a5'],
+                value: ['FE5F55', '009DFF'],
                 comment: 'Title Screen / Boss Screen colors'
             },
             {
                 key: 'MULT',
-                value: '9c6c98',
+                value: 'FE5F55',
                 comment: 'Color of the Multiplier half of the score equation'
             },
             {
                 key: 'CHIPS',
-                value: 'af84a5',
+                value: '009DFF',
                 comment: 'Color of the Chips half of the score equation'
             },
             {
                 key: 'PLASMA',
-                value: 'cc73d9',
+                value: 'CC73D9',
                 comment: 'Color of both halves when score is \'Balanced\' by Plasma Deck'
             },
             {
                 key: 'MONEY',
-                value: 'f3b958',
+                value: 'F3B958',
                 comment: 'Color of current Money ($)'
             },
             {
@@ -240,12 +240,12 @@
             },
             {
                 key: 'FILTER',
-                value: 'ff9a00',
+                value: 'FF9A00',
                 comment: 'See IMPORTANT'
             },
             {
                 key: 'BLUE',
-                value: '009dff',
+                value: '009DFF',
                 comment: 'See CHIPS'
             },
             {
@@ -260,27 +260,27 @@
             },
             {
                 key: 'PALE_GREEN',
-                value: '56a887',
+                value: '56A887',
                 comment: 'Background accent color'
             },
             {
                 key: 'ORANGE',
-                value: 'fda200',
+                value: 'FDA200',
                 comment: 'Color of some options (on main menu, Options button)'
             },
             {
                 key: 'IMPORTANT',
-                value: 'ff9a00',
+                value: 'FF9A00',
                 comment: 'Accent color of joker cards (such as designated hand)'
             },
             {
                 key: 'GOLD',
-                value: 'eac058',
+                value: 'EAC058',
                 comment: 'Money when described in a joker description'
             },
             {
                 key: 'YELLOW',
-                value: 'ffff00',
+                value: 'FFFF00',
                 comment: 'General yellow'
             },
             {
@@ -290,12 +290,12 @@
             },
             {
                 key: 'WHITE',
-                value: 'ffffff',
+                value: 'FFFFFF',
                 comment: 'Exactly white, can mess up shaders if changed'
             },
             {
                 key: 'PURPLE',
-                value: '8867a5',
+                value: '8867A5',
                 comment: 'Color for "Tarot Card" when mentioned'
             },
             {
@@ -305,12 +305,12 @@
             },
             {
                 key: 'L_BLACK',
-                value: '4f6367',
+                value: '4F6367',
                 comment: 'Light Black'
             },
             {
                 key: 'GREY',
-                value: '5f7377',
+                value: '5F7377',
                 comment: 'Grey'
             },
             {
@@ -320,32 +320,32 @@
             },
             {
                 key: 'JOKER_GREY',
-                value: 'bfc7d5',
+                value: 'BFC7D5',
                 comment: 'Joker Grey (text color)'
             },
             {
                 key: 'VOUCHER',
-                value: 'cb724c',
+                value: 'CB724C',
                 comment: 'Background for "Voucher" text'
             },
             {
                 key: 'BOOSTER',
-                value: '646eb7',
+                value: '646EB7',
                 comment: 'Background for "Booster" text'
             },
             {
                 key: 'ETERNAL',
-                value: 'c75985',
+                value: 'C75985',
                 comment: 'Background for "Eternal" text'
             },
             {
                 key: 'PERISHABLE',
-                value: '4f5da1',
+                value: '4F5DA1',
                 comment: 'Background for "Perishable" text'
             },
             {
                 key: 'RENTAL',
-                value: 'b18f43',
+                value: 'B18F43',
                 comment: 'Background for "Rental" text'
             },
             {
@@ -362,8 +362,8 @@
             {
                 key: 'SO_1',
                 value: [
-                    { key: 'Hearts', value: 'f03464', comment: '' },
-                    { key: 'Diamonds', value: 'f06b3f', comment: '' },
+                    { key: 'Hearts', value: 'F03464', comment: '' },
+                    { key: 'Diamonds', value: 'F06B3F', comment: '' },
                     { key: 'Spades', value: '403995', comment: '' },
                     { key: 'Clubs', value: '235955', comment: '' }
                 ],
@@ -372,27 +372,27 @@
             {
                 key: 'SO_2',
                 value: [
-                    { key: 'Hearts', value: 'f83b2f', comment: '' },
-                    { key: 'Diamonds', value: 'e29000', comment: '' },
-                    { key: 'Spades', value: '4f31b9', comment: '' },
-                    { key: 'Clubs', value: '008ee6', comment: '' }
+                    { key: 'Hearts', value: 'F83B2F', comment: '' },
+                    { key: 'Diamonds', value: 'E29000', comment: '' },
+                    { key: 'Spades', value: '4F31B9', comment: '' },
+                    { key: 'Clubs', value: '008EE6', comment: '' }
                 ],
                 comment: 'Normal suit colors (when mentioned)'
             },
             {
                 key: 'UI',
                 value: [
-                    { key: 'TEXT_LIGHT', value: 'ffffff', comment: '' },
+                    { key: 'TEXT_LIGHT', value: 'FFFFFF', comment: '' },
                     { key: 'TEXT_DARK', value: '4F6367', comment: '' },
                     { key: 'TEXT_INACTIVE', value: '88888899', comment: '' },
                     { key: 'BACKGROUND_LIGHT', value: 'B8D8D8', comment: '' },
-                    { key: 'BACKGROUND_WHITE', value: 'ffffff', comment: '' },
+                    { key: 'BACKGROUND_WHITE', value: 'FFFFFF', comment: '' },
                     { key: 'BACKGROUND_DARK', value: '7A9E9F', comment: '' },
                     { key: 'BACKGROUND_INACTIVE', value: '666666FF', comment: '' },
                     { key: 'OUTLINE_LIGHT', value: 'D8D8D8', comment: '' },
                     { key: 'OUTLINE_LIGHT_TRANS', value: 'D8D8D866', comment: '' },
                     { key: 'OUTLINE_DARK', value: '7A9E9F', comment: '' },
-                    { key: 'TRANSPARENT_LIGHT', value: 'eeeeee22', comment: '' },
+                    { key: 'TRANSPARENT_LIGHT', value: 'EEEEEE22', comment: '' },
                     { key: 'TRANSPARENT_DARK', value: '22222222', comment: '' },
                     { key: 'HOVER', value: '00000055', comment: '' }
                 ],
@@ -401,56 +401,56 @@
             {
                 key: 'SET',
                 value: [
-                    { key: 'Default', value: 'cdd9dc', comment: '' },
-                    { key: 'Enhanced', value: 'cdd9dc', comment: '' },
-                    { key: 'Joker', value: '424e54', comment: '' },
-                    { key: 'Tarot', value: '424e54', comment: '' },
-                    { key: 'Planet', value: '424e54', comment: '' },
-                    { key: 'Spectral', value: '424e54', comment: '' },
-                    { key: 'Voucher', value: '424e54', comment: '' }
+                    { key: 'Default', value: 'CDD9DC', comment: '' },
+                    { key: 'Enhanced', value: 'CDD9DC', comment: '' },
+                    { key: 'Joker', value: '424E54', comment: '' },
+                    { key: 'Tarot', value: '424E54', comment: '' },
+                    { key: 'Planet', value: '424E54', comment: '' },
+                    { key: 'Spectral', value: '424E54', comment: '' },
+                    { key: 'Voucher', value: '424E54', comment: '' }
                 ],
-                comment: ''
+                comment: 'Backgrounds for certain types of cards'
             },
             {
                 key: 'SECONDARY_SET',
                 value: [
-                    { key: 'Default', value: '9bb6bdFF', comment: '' },
+                    { key: 'Default', value: '9BB6BDFF', comment: '' },
                     { key: 'Enhanced', value: '8389DDFF', comment: '' },
-                    { key: 'Joker', value: '708b91', comment: '' },
-                    { key: 'Tarot', value: 'a782d1', comment: '' },
-                    { key: 'Planet', value: '13afce', comment: '' },
-                    { key: 'Spectral', value: '4584fa', comment: '' },
-                    { key: 'Voucher', value: 'fd682b', comment: '' },
-                    { key: 'Edition', value: '4ca893', comment: '' }
+                    { key: 'Joker', value: '708B91', comment: '' },
+                    { key: 'Tarot', value: 'A782D1', comment: '' },
+                    { key: 'Planet', value: '13AFCE', comment: '' },
+                    { key: 'Spectral', value: '4584FA', comment: '' },
+                    { key: 'Voucher', value: 'FD682B', comment: '' },
+                    { key: 'Edition', value: '4CA893', comment: '' }
                 ],
                 comment: 'Backgrounds for certain types of cards'
             },
             {
                 key: 'RARITY',
-                value: ['009dff', '4BC292', 'fe5f55', 'b26cbb'],
+                value: ['009DFF', '4BC292', 'FE5F55', 'B26CBB'],
                 comment: 'Rarities',
                 subComments: ['Common', 'Uncommon', 'Rare', 'Legendary']
             },
             {
                 key: 'BLIND',
                 value: [
-                    { key: 'Small', value: '50846e', comment: '' },
-                    { key: 'Big', value: '50846e', comment: '' },
-                    { key: 'Boss', value: 'b44430', comment: '' },
-                    { key: 'won', value: '4f6367', comment: '' }
+                    { key: 'Small', value: '50846E', comment: '' },
+                    { key: 'Big', value: '50846E', comment: '' },
+                    { key: 'Boss', value: 'B44430', comment: '' },
+                    { key: 'won', value: '4F6367', comment: '' }
                 ],
                 comment: ''
             },
             {
                 key: 'HAND_LEVELS',
-                value: ['efefef', '95acff', '65efaf', 'fae37e', 'ffc052', 'f87d75', 'caa0ef'],
+                value: ['EFEFEF', '95ACFF', '65EFAF', 'FAE37E', 'FFC052', 'F87D75', 'CAA0EF'],
                 comment: 'Hand Levels',
                 subComments: ['Lvl 1', 'Lvl 2', 'Lvl 3', 'Lvl 4', 'Lvl 5', 'Lvl 6', 'Lvl 7+']
             },
             {
                 key: 'BACKGROUND',
                 value: [
-                    { key: 'L', value: 'ffff00', comment: '' },
+                    { key: 'L', value: 'FFFF00', comment: '' },
                     { key: 'D', value: '374244', comment: '' },
                     { key: 'C', value: '374244', comment: '' }
                 ],
@@ -459,38 +459,38 @@
             {
                 key: 'BOSSES',
                 value: [
-                    { key: 'bl_ox', value: 'b95b08', comment: '' },
-                    { key: 'bl_hook', value: 'a84024', comment: '' },
-                    { key: 'bl_mouth', value: 'ae718e', comment: '' },
-                    { key: 'bl_fish', value: '3e85bd', comment: '' },
-                    { key: 'bl_club', value: 'b9cb92', comment: '' },
+                    { key: 'bl_ox', value: 'B95B08', comment: '' },
+                    { key: 'bl_hook', value: 'A84024', comment: '' },
+                    { key: 'bl_mouth', value: 'AE718E', comment: '' },
+                    { key: 'bl_fish', value: '3E85BD', comment: '' },
+                    { key: 'bl_club', value: 'B9CB92', comment: '' },
                     { key: 'bl_manacle', value: '575757', comment: '' },
-                    { key: 'bl_tooth', value: 'b52d2d', comment: '' },
-                    { key: 'bl_wall', value: '8a59a5', comment: '' },
-                    { key: 'bl_house', value: '5186a8', comment: '' },
-                    { key: 'bl_mark', value: '6a3847', comment: '' },
-                    { key: 'bl_wheel', value: '50bf7c', comment: '' },
-                    { key: 'bl_arm', value: '6865f3', comment: '' },
-                    { key: 'bl_psychic', value: 'efc03c', comment: '' },
-                    { key: 'bl_goad', value: 'b95c96', comment: '' },
-                    { key: 'bl_water', value: 'c6e0eb', comment: '' },
-                    { key: 'bl_eye', value: '4b71e4', comment: '' },
+                    { key: 'bl_tooth', value: 'B52D2D', comment: '' },
+                    { key: 'bl_wall', value: '8A59A5', comment: '' },
+                    { key: 'bl_house', value: '5186A8', comment: '' },
+                    { key: 'bl_mark', value: '6A3847', comment: '' },
+                    { key: 'bl_wheel', value: '50BF7C', comment: '' },
+                    { key: 'bl_arm', value: '6865F3', comment: '' },
+                    { key: 'bl_psychic', value: 'EFC03C', comment: '' },
+                    { key: 'bl_goad', value: 'B95C96', comment: '' },
+                    { key: 'bl_water', value: 'C6E0EB', comment: '' },
+                    { key: 'bl_eye', value: '4B71E4', comment: '' },
                     { key: 'bl_plant', value: '709284', comment: '' },
-                    { key: 'bl_needle', value: '5c6e31', comment: '' },
-                    { key: 'bl_head', value: 'ac9db4', comment: '' },
-                    { key: 'bl_window', value: 'a9a295', comment: '' },
-                    { key: 'bl_serpent', value: '439a4f', comment: '' },
-                    { key: 'bl_pillar', value: '7e6752', comment: '' },
-                    { key: 'bl_flint', value: 'e56a2f', comment: '' },
-                    { key: 'bl_final_bell', value: '009cfd', comment: 'Cerulean Bell' },
-                    { key: 'bl_final_leaf', value: '56a786', comment: 'Verdant Leaf' },
-                    { key: 'bl_final_vessel', value: '8a71e1', comment: 'Violet Vessel' },
-                    { key: 'bl_final_acorn', value: 'fda200', comment: 'Amber Acorn' },
-                    { key: 'bl_final_heart', value: 'ac3232', comment: 'Crimson Heart' }
+                    { key: 'bl_needle', value: '5C6E31', comment: '' },
+                    { key: 'bl_head', value: 'AC9DB4', comment: '' },
+                    { key: 'bl_window', value: 'A9A295', comment: '' },
+                    { key: 'bl_serpent', value: '439A4F', comment: '' },
+                    { key: 'bl_pillar', value: '7E6752', comment: '' },
+                    { key: 'bl_flint', value: 'E56A2F', comment: '' },
+                    { key: 'bl_final_bell', value: '009CFD', comment: 'Cerulean Bell' },
+                    { key: 'bl_final_leaf', value: '56A786', comment: 'Verdant Leaf' },
+                    { key: 'bl_final_vessel', value: '8A71E1', comment: 'Violet Vessel' },
+                    { key: 'bl_final_acorn', value: 'FDA200', comment: 'Amber Acorn' },
+                    { key: 'bl_final_heart', value: 'AC3232', comment: 'Crimson Heart' }
                 ],
                 comment: 'Boss Colors (does not affect background)'
             }
-        ];
+        ]; 
 
         // Copy of color data that will be modified
         let colorData = JSON.parse(JSON.stringify(defaultColorData));
