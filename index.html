@@ -220,9 +220,9 @@
             padding: 0;
             margin-right: 0.25em;
         }
-        #importFileButton,
         #resetAllButton,
         #exportLuaButton,
+        #importTextButton,
         #downloadLuaButton {
             display: inline-block;
             margin: 0.5em;
@@ -234,9 +234,9 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        #importFileButton:hover,
         #resetAllButton:hover,
         #exportLuaButton:hover,
+        #importTextButton:hover,
         #downloadLuaButton:hover {
             background-color: #4f6367;
         }
@@ -296,9 +296,9 @@
             .hex-input {
                 width: 4em;
             }
-            #importFileButton,
             #resetAllButton,
             #exportLuaButton,
+            #importTextButton,
             #downloadLuaButton {
                 margin: 0.25em;
                 padding: 0.5em 1em;
@@ -314,16 +314,14 @@
 
     <h1 id="pageTitle">Trance Palette Generator</h1> <!-- Default title for heading -->
 
-    <div style="text-align: center;">
-        <button id="importFileButton">Import from File</button>
-        <button id="importTextButton">Import from Text</button>
-    </div>
+    <!-- Removed the Import from File button and moved the Import from Text button to the bottom -->
 
     <div id="colorContainer"></div>
 
     <div style="text-align: center;">
         <button id="resetAllButton">Reset All</button>
         <button id="exportLuaButton">Export</button>
+        <button id="importTextButton">Import from Text</button>
         <button id="downloadLuaButton">Download Lua File</button>
     </div>
     <textarea id="exportLuaOutput" placeholder="Paste, edit, or export your Lua code here..."></textarea>
@@ -912,9 +910,12 @@
         const colorContainer = document.getElementById('colorContainer');
         createColorPickers(colorData, colorContainer, defaultColorData);
 
+        // Removed the 'Import from File' button functionality
+
         // Reset All functionality
         document.getElementById('resetAllButton').addEventListener('click', function() {
-            // [Reset functionality remains the same]
+            colorData = JSON.parse(JSON.stringify(defaultColorData));
+            createColorPickers(colorData, document.getElementById('colorContainer'), defaultColorData);
         });
 
         // Export to Lua functionality
@@ -925,7 +926,12 @@
 
         // Download Lua File functionality
         document.getElementById('downloadLuaButton').addEventListener('click', function() {
-            // [Download functionality remains the same]
+            const luaData = 'return ' + convertToLuaTable(colorData);
+            const blob = new Blob([luaData], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'New_Theme.lua';
+            link.click();
         });
 
         // Function to convert the array-based color data to Lua table format
@@ -971,7 +977,7 @@
             return lua;
         }
         
-        // Event listener for 'Import from Text' button
+        // Corrected Import from Text functionality
         document.getElementById('importTextButton').addEventListener('click', function() {
             const luaCode = document.getElementById('exportLuaOutput').value;
             try {
@@ -989,17 +995,18 @@
         });
 
         function parseLuaPalette(luaCode) {
+            // Corrected regex patterns
             const hexPattern = /HEX'([0-9A-Fa-f]{6,8})'/g;
             const keyPattern = /(\w+)\s*=\s*(\{[\s\S]*?\}|HEX'([0-9A-Fa-f]{6,8})')/g;
-
+    
             const parsedData = JSON.parse(JSON.stringify(defaultColorData));
             let match;
-
+    
             while ((match = keyPattern.exec(luaCode)) !== null) {
                 const key = match[1];
                 const valueStr = match[2];
                 const hexValue = match[3] || '';
-
+    
                 const item = parsedData.find(item => item.key === key);
                 if (item) {
                     if (valueStr.startsWith('{')) {
@@ -1023,7 +1030,7 @@
                     }
                 }
             }
-
+    
             return parsedData;
         }
     </script>
