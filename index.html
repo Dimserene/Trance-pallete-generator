@@ -127,7 +127,7 @@
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
             margin: 0;
-            padding: 0;
+            padding-bottom: 60px; /* Add bottom padding to prevent content from being covered */
         }
         h1 {
             text-align: center;
@@ -253,6 +253,39 @@
             border-radius: 4px;
             resize: vertical;
         }
+        /* Footer Styles */
+        footer {
+            text-align: center;
+            padding: 5px;
+            background-color: #374244;
+            color: white;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+        }
+        footer a {
+            color: #ffd700;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        /* Style for the "Jump to Top" button inside the footer */
+        #scrollTopButton {
+            display: inline-block;
+            margin-left: 20px;
+            padding: 10px 15px;
+            font-size: 1em;
+            background-color: #4f6367;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #scrollTopButton:hover {
+            background-color: #555;
+        }
         /* Mobile Styles */
         @media (max-width: 600px) {
             .category {
@@ -307,14 +340,21 @@
                 height: 200px;
                 margin: 0.25em auto;
             }
+            footer {
+                padding: 0px;
+                font-size: 0.8em;
+            }
+            /* Adjust the "Jump to Top" button in the footer on mobile */
+            #scrollTopButton {
+                margin-top: 5px;
+                padding: 5px 5px;
+            }
         }
     </style>
 </head>
 <body>
 
     <h1 id="pageTitle">Trance Palette Generator</h1> <!-- Default title for heading -->
-
-    <!-- Removed the Import from File button and moved the Import from Text button to the bottom -->
 
     <div style="text-align: center;">
         <button id="resetAllButton">Reset All</button>
@@ -325,6 +365,16 @@
     <textarea id="exportLuaOutput" placeholder="Paste, edit, or export your Lua code here..."></textarea>
     
     <div id="colorContainer"></div>
+
+    <!-- Footer with Trance Mod Link, Credits, and "Jump to Top" Button -->
+    <footer>
+        <p>
+            <a href="https://github.com/MathIsFun0/Trance/releases/latest" target="_blank">Download Trance</a> |
+            Created by Dimserene
+            <!-- "Jump to Top" button inside the footer -->
+            <button id="scrollTopButton" title="Go to top">Top</button>
+        </p>
+    </footer>
 
     <!-- Include jQuery (Spectrum dependency) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -648,10 +698,10 @@
 
         // Function to create color pickers using Spectrum
         function createColorPickers(dataArray, container, defaultDataArray) {
-            // ** Clear the container to prevent duplicates **
+            // Clear the container to prevent duplicates
             container.innerHTML = '';
             
-            // ** Reset the spectrumInstances array **
+            // Reset the spectrumInstances array
             spectrumInstances = [];
             
             const mainCategory = { key: 'Main', items: [] };
@@ -713,7 +763,7 @@
                 categoryDiv.className = 'category';
 
                 const categoryTitle = document.createElement('h2');
-                categoryTitle.textContent = category.key;
+                categoryTitle.textContent = category.displayName || category.key;
                 categoryDiv.appendChild(categoryTitle);
 
                 const colorGrid = document.createElement('div');
@@ -741,7 +791,7 @@
             categoryDiv.className = 'category';
 
             const categoryTitle = document.createElement('h2');
-            categoryTitle.textContent = categoryObj.key;
+            categoryTitle.textContent = categoryObj.displayName || categoryObj.key;
             categoryDiv.appendChild(categoryTitle);
 
             const colorGrid = document.createElement('div');
@@ -772,44 +822,44 @@
         function createColorItem(colorValue, displayName, parentDataArray, dataIndex, container, defaultColorValue, comment = '') {
             // Provide a default value if defaultColorValue is undefined
             defaultColorValue = defaultColorValue || 'FFFFFF';
-
+        
             const colorItem = document.createElement('div');
             colorItem.className = 'color-item';
-
+        
             const colorName = document.createElement('div');
             colorName.className = 'color-name';
             colorName.textContent = displayName;
-
+        
             colorItem.appendChild(colorName);
-
+        
             const controlsContainer = document.createElement('div');
             controlsContainer.className = 'controls-container';
-
+        
             const colorOriginal = document.createElement('div');
             colorOriginal.className = 'color-original';
             colorOriginal.style.backgroundColor = '#' + defaultColorValue.slice(0, 6);
-
+        
             const arrow = document.createElement('div');
             arrow.className = 'arrow';
             arrow.textContent = '→';
-
+        
             // Create an input for Spectrum
             const colorInput = document.createElement('input');
             colorInput.type = 'text';
             colorInput.className = 'color-picker';
-
+        
             // Set initial value (including alpha)
             let hexColor = colorValue.slice(0, 6).toUpperCase();
             let alpha = colorValue.length >= 8 ? parseInt(colorValue.slice(6, 8), 16) / 255 : 1;
-
+        
             colorInput.value = '#' + colorValue.slice(0, 6);
-
+        
             const hexInput = document.createElement('input');
             hexInput.type = 'text';
             hexInput.value = colorValue.toUpperCase();
             hexInput.className = 'hex-input';
             hexInput.maxLength = 8;
-
+        
             // Reset Button
             const resetButton = document.createElement('button');
             resetButton.className = 'reset-button';
@@ -817,7 +867,11 @@
             resetButton.addEventListener('click', function() {
                 // Reset data
                 if (Array.isArray(parentDataArray)) {
-                    parentDataArray[dataIndex].value = defaultColorValue;
+                    if (typeof parentDataArray[dataIndex] === 'object') {
+                        parentDataArray[dataIndex].value = defaultColorValue;
+                    } else {
+                        parentDataArray[dataIndex] = defaultColorValue;
+                    }
                 } else {
                     parentDataArray.value = defaultColorValue;
                 }
@@ -829,17 +883,17 @@
                 // Update hex input
                 hexInput.value = defaultColorValue.toUpperCase();
             });
-
+        
             // Append elements to controlsContainer
             controlsContainer.appendChild(colorOriginal);
             controlsContainer.appendChild(arrow);
             controlsContainer.appendChild(colorInput);
             controlsContainer.appendChild(hexInput);
             controlsContainer.appendChild(resetButton);
-
+        
             // Append controlsContainer to colorItem
             colorItem.appendChild(controlsContainer);
-
+        
             // Now append the comment after the controlsContainer
             if (comment) {
                 const colorComment = document.createElement('div');
@@ -847,10 +901,10 @@
                 colorComment.textContent = comment;
                 colorItem.appendChild(colorComment);
             }
-
+        
             // Append the colorItem to the container
             container.appendChild(colorItem);
-
+        
             // Initialize Spectrum on the colorInput
             const spectrumInstance = $(colorInput).spectrum({
                 color: '#' + hexColor + (alpha < 1 ? Math.round(alpha * 255).toString(16).padStart(2, '0') : ''),
@@ -861,14 +915,17 @@
                 move: function(tinycolor) {
                     const newHex8 = tinycolor.toHex8String().toUpperCase();
                     hexInput.value = newHex8.slice(1);
+                    // Update colorData here on the color move
+                    updateParentData(newHex8.slice(1));
                 },
                 change: function(tinycolor) {
                     const newHex8 = tinycolor.toHex8String().toUpperCase();
                     hexInput.value = newHex8.slice(1);
+                    // Update colorData when the color picker changes
                     updateParentData(newHex8.slice(1));
                 }
             });
-
+        
             // Store reference for reset all functionality
             spectrumInstances.push({
                 spectrumInstance: spectrumInstance,
@@ -878,8 +935,20 @@
                 dataIndex: dataIndex,
                 defaultColorValue: defaultColorValue
             });
-
-            // Update functions
+        
+            // Update function to modify colorData
+            function updateParentData(newColor) {
+                if (Array.isArray(parentDataArray)) {
+                    if (typeof parentDataArray[dataIndex] === 'object') {
+                        parentDataArray[dataIndex].value = newColor;
+                    } else {
+                        parentDataArray[dataIndex] = newColor;
+                    }
+                } else {
+                    parentDataArray.value = newColor;
+                }
+            }
+        
             function updateColor(newColor) {
                 if (/^[0-9A-Fa-f]{6,8}$/.test(newColor)) {
                     let colorString = '#' + newColor;
@@ -887,26 +956,27 @@
                     updateParentData(newColor.toUpperCase());
                 }
             }
-
-            function updateParentData(newColor) {
-                if (Array.isArray(parentDataArray)) {
-                    parentDataArray[dataIndex].value = newColor;
-                } else {
-                    parentDataArray.value = newColor;
-                }
-            }
-
+        
             hexInput.addEventListener('input', function() {
                 const newHex = hexInput.value.toUpperCase();
                 if (/^[0-9A-Fa-f]{6,8}$/.test(newHex)) {
                     updateColor(newHex);
                 }
             });
-
+        
             hexInput.addEventListener('blur', function() {
                 // Validate hex code on blur
                 if (!/^[0-9A-Fa-f]{6,8}$/.test(hexInput.value)) {
-                    const currentHex = Array.isArray(parentDataArray) ? parentDataArray[dataIndex].value : parentDataArray.value;
+                    let currentHex;
+                    if (Array.isArray(parentDataArray)) {
+                        if (typeof parentDataArray[dataIndex] === 'object') {
+                            currentHex = parentDataArray[dataIndex].value;
+                        } else {
+                            currentHex = parentDataArray[dataIndex];
+                        }
+                    } else {
+                        currentHex = parentDataArray.value;
+                    }
                     hexInput.value = currentHex.toUpperCase();
                 }
             });
@@ -969,7 +1039,7 @@
                         });
                         lua += indent2 + '},\n';
                     } else {
-                        lua += 'nil,\n';
+                        lua += '{},\n';
                     }
                 } else if (typeof value === 'string') {
                     lua += 'HEX(\'' + value + '\'),\n';
@@ -980,17 +1050,14 @@
             lua += indent + '}';
             return lua;
         }
-        
+
         // Corrected Import from Text functionality
         document.getElementById('importTextButton').addEventListener('click', function() {
             const luaCode = document.getElementById('exportLuaOutput').value;
             try {
                 const importedData = parseLuaPalette(luaCode);
                 if (importedData) {
-                    // ** Update the colorData with importedData **
                     colorData = importedData;
-
-                    // ** Re-create the color pickers with updated data **
                     createColorPickers(colorData, document.getElementById('colorContainer'), defaultColorData);
                 } else {
                     alert('Failed to import palette. Invalid format.');
@@ -1002,25 +1069,24 @@
         });
 
         function parseLuaPalette(luaCode) {
-            // Corrected regex patterns
-            const hexPattern = /HEX'([0-9A-Fa-f]{6,8})'/g;
-            const keyPattern = /(\w+)\s*=\s*(\{[\s\S]*?\}|HEX'([0-9A-Fa-f]{6,8})')/g;
-
-            const parsedData = JSON.parse(JSON.stringify(defaultColorData));
+            const hexPattern = /HEX\('([0-9A-Fa-f]{6,8})'\)/g;
+            const keyPattern = /(\w+)\s*=\s*(\{[\s\S]*?\}|HEX\('([0-9A-Fa-f]{6,8})'\))/g;
+        
+            let parsedData = JSON.parse(JSON.stringify(defaultColorData));
             let match;
-
+        
             while ((match = keyPattern.exec(luaCode)) !== null) {
                 const key = match[1];
                 const valueStr = match[2];
                 const hexValue = match[3] || '';
-
+        
                 const item = parsedData.find(item => item.key === key);
                 if (item) {
                     if (valueStr.startsWith('{')) {
-                        // Parse nested array
+                        // Handle nested array
                         const nestedHexPattern = /HEX'([0-9A-Fa-f]{6,8})'/g;
-                        const values = [];
                         let nestedMatch;
+                        const values = [];
                         while ((nestedMatch = nestedHexPattern.exec(valueStr)) !== null) {
                             values.push(nestedMatch[1]);
                         }
@@ -1036,14 +1102,18 @@
                             }
                         }
                     } else if (hexValue) {
-                        // Single HEX value
+                        // Handle single HEX value
                         item.value = hexValue;
                     }
                 }
             }
-
+        
             return parsedData;
         }
+        
+        document.getElementById('scrollTopButton').addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
     </script>
 </body>
 </html>
