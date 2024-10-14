@@ -208,7 +208,7 @@
             font-size: 0.8em;
             border: 1px solid #cccccc;
             border-radius: 2px;
-            text-transform: uppercase;
+            /*text-transform: uppercase;*/
         }
         .reset-button {
             width: 1.2em;
@@ -390,6 +390,10 @@
         <!-- Simple Message -->
     <div id="simpleMessage">
         <p>Tip: You can input keys in the hex input field to choose the assigned colors.<br>Add a "$" symbol like "<code>$FILTER</code>" to choose default color.</p>
+        <p>
+            You can input keys like <code>SPLASH[0]</code> and <code>SO_2.Hearts</code> in the hex input field to choose colors.
+            <br>Note: Keys are case-sensitive.
+        </p>
     </div>
     <!-- End of Simple Message -->
         
@@ -982,9 +986,11 @@
             function updateColor(newColor) {
                 // Validate hex code or keyword
                 if (/^[0-9A-Fa-f]{6,8}$/.test(newColor)) {
-                    let colorString = '#' + newColor;
+                    let upperHex = newColor.toUpperCase();
+                    let colorString = '#' + upperHex;
                     $(colorInput).spectrum("set", colorString);
-                    updateParentData(newColor.toUpperCase());
+                    updateParentData(upperHex);
+                    hexInput.value = upperHex; // Set the input value to uppercase hex code
                 } else {
                     // Handle keyword input
                     let isDefault = false;
@@ -993,25 +999,25 @@
                         isDefault = true;
                         key = newColor.substring(1);
                     }
-                    key = key.toUpperCase().trim(); // Make lookup case-insensitive
+                    key = key.trim(); // Preserve case for key
                     let lookupColor = lookupColorByKey(key, isDefault);
                     if (lookupColor) {
                         $(colorInput).spectrum("set", '#' + lookupColor);
-                        hexInput.value = lookupColor.toUpperCase();
-                        updateParentData(lookupColor.toUpperCase());
+                        hexInput.value = lookupColor; // Preserve case for the color code
+                        updateParentData(lookupColor);
                     } else {
                         // If keyword doesn't exist, provide feedback
-                        alert(`Keyword "${newColor}" not found.`);
+                        alert(`Key "${newColor}" not found.`);
                         // Reset to previous value
                         let currentHex = getCurrentHexValue();
-                        hexInput.value = currentHex.toUpperCase();
+                        hexInput.value = currentHex;
                     }
                 }
             }
-        
+            
             hexInput.addEventListener('keydown', function(event) {
                 if (event.key === 'Enter') {
-                    const newInput = hexInput.value.trim().toUpperCase();
+                    const newInput = hexInput.value.trim();
                     if (newInput !== '') {
                         updateColor(newInput);
                     }
@@ -1019,16 +1025,16 @@
             });
         
             hexInput.addEventListener('blur', function() {
-                const newInput = hexInput.value.trim().toUpperCase();
+                const newInput = hexInput.value.trim();
                 if (newInput === '') {
                     // If empty, reset to current value
                     let currentHex = getCurrentHexValue();
-                    hexInput.value = currentHex.toUpperCase();
+                    hexInput.value = currentHex;
                 } else if (!/^[0-9A-Fa-f]{6,8}$/.test(newInput) && !isValidKeyword(newInput)) {
                     // If invalid, reset to current color value
                     let currentHex = getCurrentHexValue();
-                    hexInput.value = currentHex.toUpperCase();
-                } else if (newInput !== getCurrentHexValue().toUpperCase()) {
+                    hexInput.value = currentHex;
+                } else if (newInput !== getCurrentHexValue() ){
                     // If valid and different, update the color
                     updateColor(newInput);
                 }
@@ -1050,11 +1056,10 @@
             // Helper function to check if input is a valid keyword
             function isValidKeyword(input) {
                 let key = input.startsWith('$') ? input.substring(1) : input;
-                key = key.toUpperCase();
+                key = key.trim();
                 return doesKeyExist(key);
             }
         }
-
         // Initialize the color pickers
         const colorContainer = document.getElementById('colorContainer');
         createColorPickers(colorData, colorContainer, defaultColorData);
@@ -1202,9 +1207,11 @@
         });
         
         // Function to lookup color by key
-        function lookupColorByKey(key, useDefault = false) {
+        function lookupColorByKey(keyPath, useDefault = false) {
             let dataArray = useDefault ? defaultColorData : colorData;
-            let result = findColorInDataArray(dataArray, key);
+            let keys = parseKeyPath(keyPath);
+            if (!keys) return null;
+            let result = findColorByKeyPath(dataArray, keys);
             return result ? result.toUpperCase() : null;
         }
         
@@ -1243,8 +1250,71 @@
         }
         
         // Function to check if a key exists
-        function doesKeyExist(key) {
-            return lookupColorByKey(key, true) !== null || lookupColorByKey(key, false) !== null;
+        function doesKeyExist(keyPath) {
+            return lookupColorByKey(keyPath, true) !== null || lookupColorByKey(keyPath, false) !== null;
+        }
+        
+        function parseKeyPath(keyPath) {
+            // Split by '.' to separate nested keys
+            let parts = keyPath.split('.');
+            let keys = [];
+            for (let part of parts) {
+                // Handle indices in square brackets
+                let regex = /([^\[|\]]+)(\[\d+\])*/g;
+                let match;
+                while ((match = regex.exec(part)) !== null) {
+                    let key = match[1];
+                    keys.push(key);
+                    if (match[2]) {
+                        let indices = match[2].match(/\d+/g).map(Number);
+                        keys.push(...indices);
+                    }
+                }
+            }
+            return keys.length > 0 ? keys : null;
+        }
+
+        function findColorByKeyPath(data, keys) {
+            if (!data || keys.length === 0) {
+                if (typeof data === 'object' && data.value && typeof data.value === 'string') {
+                    return data.value;
+                }
+                return null;
+            }
+        
+            let key = keys[0];
+            let remainingKeys = keys.slice(1);
+        
+            if (Array.isArray(data)) {
+                if (typeof key === 'number') {
+                    // Key is an index
+                    if (data[key]) {
+                        return findColorByKeyPath(data[key], remainingKeys);
+                    } else {
+                        return null;
+                    }
+                } else {
+                    // Key is a string, find object with matching key
+                    for (let item of data) {
+                        if (item.key === key) {
+                            return findColorByKeyPath(item, remainingKeys);
+                        }
+                    }
+                    return null;
+                }
+            } else if (typeof data === 'object') {
+                if (data.key === key) {
+                    if (remainingKeys.length === 0 && typeof data.value === 'string') {
+                        // Found the color value
+                        return data.value;
+                    } else if (data.value) {
+                        return findColorByKeyPath(data.value, remainingKeys);
+                    }
+                } else if (data.value && typeof data.value === 'object') {
+                    return findColorByKeyPath(data.value, keys);
+                }
+            }
+            return null;
         }
     </script>
 </body>
