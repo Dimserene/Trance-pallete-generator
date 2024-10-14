@@ -376,7 +376,7 @@
         <p>
             <a href="https://github.com/MathIsFun0/Trance" target="_blank">Download Trance</a>
                 | 
-                This Page is Created by Dimserene
+                Page Created by Dimserene
         </p>
     </footer>
 
@@ -956,36 +956,79 @@
             }
         
             function updateColor(newColor) {
+                // Validate hex code or keyword
                 if (/^[0-9A-Fa-f]{6,8}$/.test(newColor)) {
                     let colorString = '#' + newColor;
                     $(colorInput).spectrum("set", colorString);
                     updateParentData(newColor.toUpperCase());
+                } else {
+                    // Handle keyword input
+                    let isDefault = false;
+                    let key = newColor;
+                    if (newColor.startsWith('$')) {
+                        isDefault = true;
+                        key = newColor.substring(1);
+                    }
+                    key = key.toUpperCase().trim(); // Make lookup case-insensitive
+                    let lookupColor = lookupColorByKey(key, isDefault);
+                    if (lookupColor) {
+                        $(colorInput).spectrum("set", '#' + lookupColor);
+                        hexInput.value = lookupColor.toUpperCase();
+                        updateParentData(lookupColor.toUpperCase());
+                    } else {
+                        // If keyword doesn't exist, provide feedback
+                        alert(`Keyword "${newColor}" not found.`);
+                        // Reset to previous value
+                        let currentHex = getCurrentHexValue();
+                        hexInput.value = currentHex.toUpperCase();
+                    }
                 }
             }
         
-            hexInput.addEventListener('input', function() {
-                const newHex = hexInput.value.toUpperCase();
-                if (/^[0-9A-Fa-f]{6,8}$/.test(newHex)) {
-                    updateColor(newHex);
+            hexInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    const newInput = hexInput.value.trim().toUpperCase();
+                    if (newInput !== '') {
+                        updateColor(newInput);
+                    }
                 }
             });
         
             hexInput.addEventListener('blur', function() {
-                // Validate hex code on blur
-                if (!/^[0-9A-Fa-f]{6,8}$/.test(hexInput.value)) {
-                    let currentHex;
-                    if (Array.isArray(parentDataArray)) {
-                        if (typeof parentDataArray[dataIndex] === 'object') {
-                            currentHex = parentDataArray[dataIndex].value;
-                        } else {
-                            currentHex = parentDataArray[dataIndex];
-                        }
-                    } else {
-                        currentHex = parentDataArray.value;
-                    }
+                const newInput = hexInput.value.trim().toUpperCase();
+                if (newInput === '') {
+                    // If empty, reset to current value
+                    let currentHex = getCurrentHexValue();
                     hexInput.value = currentHex.toUpperCase();
+                } else if (!/^[0-9A-Fa-f]{6,8}$/.test(newInput) && !isValidKeyword(newInput)) {
+                    // If invalid, reset to current color value
+                    let currentHex = getCurrentHexValue();
+                    hexInput.value = currentHex.toUpperCase();
+                } else if (newInput !== getCurrentHexValue().toUpperCase()) {
+                    // If valid and different, update the color
+                    updateColor(newInput);
                 }
             });
+        
+            // Helper function to get current hex value from parentDataArray
+            function getCurrentHexValue() {
+                if (Array.isArray(parentDataArray)) {
+                    if (typeof parentDataArray[dataIndex] === 'object') {
+                        return parentDataArray[dataIndex].value;
+                    } else {
+                        return parentDataArray[dataIndex];
+                    }
+                } else {
+                    return parentDataArray.value;
+                }
+            }
+        
+            // Helper function to check if input is a valid keyword
+            function isValidKeyword(input) {
+                let key = input.startsWith('$') ? input.substring(1) : input;
+                key = key.toUpperCase();
+                return doesKeyExist(key);
+            }
         }
 
         // Initialize the color pickers
@@ -1133,6 +1176,52 @@
         document.getElementById('scrollTopButton').addEventListener('click', function() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
+        
+        // Function to lookup color by key
+        function lookupColorByKey(key, useDefault = false) {
+            let dataArray = useDefault ? defaultColorData : colorData;
+            let result = findColorInDataArray(dataArray, key);
+            return result ? result.toUpperCase() : null;
+        }
+        
+        // Recursive function to find color in data array
+        function findColorInDataArray(dataArray, key) {
+            for (let item of dataArray) {
+                if (item.key && item.key.toUpperCase() === key) {
+                    if (typeof item.value === 'string') {
+                        return item.value;
+                    } else if (Array.isArray(item.value)) {
+                        // If the value is an array, you might decide how to handle it
+                        // For simplicity, return null or handle nested keys
+                        continue;
+                    }
+                } else if (Array.isArray(item.value)) {
+                    // Check within nested arrays
+                    let result = findColorInValueArray(item.value, key);
+                    if (result) {
+                        return result;
+                    }
+                }
+            }
+            return null;
+        }
+        
+        // Function to find color in value array
+        function findColorInValueArray(valueArray, key) {
+            for (let val of valueArray) {
+                if (val.key && val.key.toUpperCase() === key) {
+                    if (typeof val.value === 'string') {
+                        return val.value;
+                    }
+                }
+            }
+            return null;
+        }
+        
+        // Function to check if a key exists
+        function doesKeyExist(key) {
+            return lookupColorByKey(key, true) !== null || lookupColorByKey(key, false) !== null;
+        }
     </script>
 </body>
 </html>
