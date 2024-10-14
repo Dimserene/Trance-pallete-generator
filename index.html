@@ -253,6 +253,24 @@
             border-radius: 4px;
             resize: vertical;
         }
+        /* Styles for the Simple Message */
+        #simpleMessage {
+            width: calc(100% - 1em);
+            max-width: 1200px;
+            margin: 0.5em auto;
+            background-color: #f9f9f9;
+            padding: 1px;
+            border-radius: 4px;
+            box-sizing: border-box;
+            text-align: center;
+            font-size: 1em;
+            color: #333;
+        }
+        #simpleMessage code {
+            background-color: #e0e0e0;
+            padding: 0px 0px;
+            border-radius: 3px;
+        }
         /* Footer Styles */
         footer {
             text-align: center;
@@ -368,7 +386,13 @@
         <button id="downloadLuaButton">Download Lua File</button>
     </div>
     <textarea id="exportLuaOutput" placeholder="Paste, edit, or export your Lua code here..."></textarea>
-    
+        
+        <!-- Simple Message -->
+    <div id="simpleMessage">
+        <p>Tip: You can input keys in the hex input field to choose the assigned colors.<br>Add a "$" symbol like "<code>$FILTER</code>" to choose default color.</p>
+    </div>
+    <!-- End of Simple Message -->
+        
     <div id="colorContainer"></div>
 
     <!-- Footer with Trance Mod Link, Credits -->
