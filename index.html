@@ -414,8 +414,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Include Spectrum JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.js"></script>
-    <!-- Include the browser-ready IIFE build of Luaparse -->
-    <script src="https://unpkg.com/luaparse/dist/luaparse.iife.min.js"></script>
     <script>
         // Updated color data with individual comments for array items and display names for categories
         const defaultColorData = [
@@ -1008,41 +1006,6 @@
                 }
             }
             
-            function updateColorData(dataArray, parsedObj) {
-                dataArray.forEach(item => {
-                    const key = item.key;
-                    if (parsedObj.hasOwnProperty(key)) {
-                        const value = parsedObj[key];
-                        if (typeof value === 'string') {
-                            item.value = value.toUpperCase();
-                        } else if (Array.isArray(value.array)) {
-                            // Handle arrays
-                            if (Array.isArray(item.value)) {
-                                for (let i = 0; i < value.array.length; i++) {
-                                    const val = value.array[i];
-                                    if (item.value[i]) {
-                                        if (typeof item.value[i] === 'object') {
-                                            item.value[i].value = val.toUpperCase();
-                                        } else {
-                                            item.value[i] = val.toUpperCase();
-                                        }
-                                    }
-                                }
-                            }
-                        } else if (typeof value === 'object') {
-                            // Handle nested objects
-                            if (Array.isArray(item.value)) {
-                                item.value.forEach(subItem => {
-                                    if (value.hasOwnProperty(subItem.key)) {
-                                        subItem.value = value[subItem.key].toUpperCase();
-                                    }
-                                });
-                            }
-                        }
-                    }
-                });
-            }
-            
             hexInput.addEventListener('keydown', function(event) {
                 if (event.key === 'Enter') {
                     const newInput = hexInput.value.trim();
@@ -1175,96 +1138,46 @@
         });
 
         function parseLuaPalette(luaCode) {
-            // Remove comments
-            luaCode = luaCode.replace(/--.*$/gm, '');
-            // Remove 'return' keyword and any leading/trailing whitespace
-            luaCode = luaCode.replace(/^return\s*/, '').trim();
+            const hexPattern = /HEX\('([0-9A-Fa-f]{6,8})'\)/g;
+            const keyPattern = /(\w+)\s*=\s*(\{[\s\S]*?\}|HEX\('([0-9A-Fa-f]{6,8})'\))/g;
         
-            try {
-                // Parse the Lua code into an AST using the global luaparse object
-                const ast = luaparse.parse(luaCode, { luaVersion: '5.3' });
-                // Convert the AST to a JavaScript object
-                const parsedObj = astToObject(ast);
+            let parsedData = JSON.parse(JSON.stringify(defaultColorData));
+            let match;
         
-                // Create a new copy of defaultColorData and update it
-                const newColorData = JSON.parse(JSON.stringify(defaultColorData));
-                updateColorData(newColorData, parsedObj);
-                return newColorData;
-            } catch (e) {
-                console.error('Error parsing Lua code:', e);
-                alert('Failed to parse Lua code. Please check the format.');
-                return null;
-            }
-        }
+            while ((match = keyPattern.exec(luaCode)) !== null) {
+                const key = match[1];
+                const valueStr = match[2];
+                const hexValue = match[3] || '';
         
-        function astToObject(ast) {
-            const result = {};
-        
-            // We expect the AST to have a body with assignments
-            if (ast.type === 'Chunk' && ast.body.length > 0) {
-                ast.body.forEach(node => {
-                    if (node.type === 'ReturnStatement') {
-                        node.arguments.forEach(arg => {
-                            if (arg.type === 'TableConstructorExpression') {
-                                Object.assign(result, parseTable(arg));
+                const item = parsedData.find(item => item.key === key);
+                if (item) {
+                    if (valueStr.startsWith('{')) {
+                        // Handle nested array
+                        const nestedHexPattern = /HEX'([0-9A-Fa-f]{6,8})'/g;
+                        let nestedMatch;
+                        const values = [];
+                        while ((nestedMatch = nestedHexPattern.exec(valueStr)) !== null) {
+                            values.push(nestedMatch[1]);
+                        }
+                        if (Array.isArray(item.value)) {
+                            for (let i = 0; i < item.value.length; i++) {
+                                if (values[i]) {
+                                    if (typeof item.value[i] === 'object') {
+                                        item.value[i].value = values[i];
+                                    } else {
+                                        item.value[i] = values[i];
+                                    }
+                                }
                             }
-                        });
+                        }
+                    } else if (hexValue) {
+                        // Handle single HEX value
+                        item.value = hexValue;
                     }
-                });
-            }
-        
-            return result;
-        }
-        
-        function parseTable(tableNode) {
-            const table = {};
-        
-            tableNode.fields.forEach(field => {
-                if (field.type === 'TableKey' || field.type === 'TableKeyString') {
-                    const key = parseExpression(field.key);
-                    const value = parseExpression(field.value);
-                    table[key] = value;
-                } else if (field.type === 'TableValue') {
-                    // Handle array entries
-                    const value = parseExpression(field.value);
-                    if (!Array.isArray(table.array)) {
-                        table.array = [];
-                    }
-                    table.array.push(value);
-                }
-            });
-        
-            return table;
-        }
-        
-        function parseExpression(node) {
-            switch (node.type) {
-                case 'StringLiteral':
-                    return node.value;
-                case 'NumericLiteral':
-                    return node.value;
-                case 'BooleanLiteral':
-                    return node.value;
-                case 'TableConstructorExpression':
-                    return parseTable(node);
-                case 'CallExpression':
-                    return parseFunctionCall(node);
-                case 'Identifier':
-                    return node.name;
-                default:
-                    return null;
-            }
-        }
-        
-        function parseFunctionCall(node) {
-            // Assuming function calls are like HEX('FFFFFF')
-            if (node.base.type === 'Identifier' && node.base.name === 'HEX') {
-                const arg = node.arguments[0];
-                if (arg.type === 'StringLiteral') {
-                    return arg.value.toUpperCase();
                 }
             }
-            return null;
+        
+            return parsedData;
         }
         
         // Add the scroll event listener to show/hide the "Top" button
