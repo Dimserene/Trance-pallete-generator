@@ -414,6 +414,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Include Spectrum JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.js"></script>
+    <!-- Include the browser-ready IIFE build of Luaparse -->
+    <script src="https://unpkg.com/luaparse/dist/luaparse.iife.min.js"></script>
     <script>
         // Updated color data with individual comments for array items and display names for categories
         const defaultColorData = [
@@ -1124,60 +1126,297 @@
         document.getElementById('importTextButton').addEventListener('click', function() {
             const luaCode = document.getElementById('exportLuaOutput').value;
             try {
-                const importedData = parseLuaPalette(luaCode);
-                if (importedData) {
-                    colorData = importedData;
+                const flattenedData = parseLuaPalette(luaCode);
+                if (flattenedData) {
+                    // Create a new copy of defaultColorData
+                    colorData = JSON.parse(JSON.stringify(defaultColorData));
+                    // Update colorData with the flattened data
+                    updateColorData(colorData, flattenedData);
                     createColorPickers(colorData, document.getElementById('colorContainer'), defaultColorData);
                 } else {
                     alert('Failed to import palette. Invalid format.');
                 }
             } catch (err) {
                 console.error(err);
-                alert('An error occurred while importing the Lua code.');
+                alert(`An error occurred while importing the Lua code: ${err.message}`);
             }
         });
 
-        function parseLuaPalette(luaCode) {
-            const hexPattern = /HEX\('([0-9A-Fa-f]{6,8})'\)/g;
-            const keyPattern = /(\w+)\s*=\s*(\{[\s\S]*?\}|HEX\('([0-9A-Fa-f]{6,8})'\))/g;
-        
-            let parsedData = JSON.parse(JSON.stringify(defaultColorData));
-            let match;
-        
-            while ((match = keyPattern.exec(luaCode)) !== null) {
-                const key = match[1];
-                const valueStr = match[2];
-                const hexValue = match[3] || '';
-        
-                const item = parsedData.find(item => item.key === key);
-                if (item) {
-                    if (valueStr.startsWith('{')) {
-                        // Handle nested array
-                        const nestedHexPattern = /HEX'([0-9A-Fa-f]{6,8})'/g;
-                        let nestedMatch;
-                        const values = [];
-                        while ((nestedMatch = nestedHexPattern.exec(valueStr)) !== null) {
-                            values.push(nestedMatch[1]);
-                        }
-                        if (Array.isArray(item.value)) {
-                            for (let i = 0; i < item.value.length; i++) {
-                                if (values[i]) {
-                                    if (typeof item.value[i] === 'object') {
-                                        item.value[i].value = values[i];
-                                    } else {
-                                        item.value[i] = values[i];
-                                    }
-                                }
-                            }
-                        }
-                    } else if (hexValue) {
-                        // Handle single HEX value
-                        item.value = hexValue;
+            
+        // Function to update colorData with the flattened data
+        function updateColorData(dataArray, flattenedObj) {
+            dataArray.forEach(item => {
+                const key = item.key;
+                if (flattenedObj.hasOwnProperty(key)) {
+                    const value = flattenedObj[key];
+                    if (typeof value === 'string') {
+                        item.value = value.toUpperCase();
                     }
+                } else if (Array.isArray(item.value)) {
+                    item.value.forEach((subItem, index) => {
+                        let subKey = subItem.key ? `${key}.${subItem.key}` : `${key}[${index}]`;
+                        if (flattenedObj.hasOwnProperty(subKey)) {
+                            subItem.value = flattenedObj[subKey].toUpperCase();
+                        } else if (typeof subItem.value === 'object') {
+                            updateNestedColorData(subItem.value, subKey, flattenedObj);
+                        }
+                    });
+                } else if (typeof item.value === 'object') {
+                    updateNestedColorData(item.value, key, flattenedObj);
+                }
+            });
+        }
+        
+        function updateNestedColorData(obj, parentKey, flattenedObj) {
+            for (let key in obj) {
+                let newKey = `${parentKey}.${key}`;
+                if (flattenedObj.hasOwnProperty(newKey)) {
+                    obj[key] = flattenedObj[newKey].toUpperCase();
+                } else if (typeof obj[key] === 'object') {
+                    updateNestedColorData(obj[key], newKey, flattenedObj);
+                }
+            }
+        }
+
+
+        function parseLuaPalette(luaCode) {
+            // Remove comments
+            luaCode = luaCode.replace(/--.*$/gm, '');
+        
+            // Remove 'return' keyword and any leading whitespace
+            luaCode = luaCode.replace(/^\s*return\s*/, '');
+        
+            // Replace function calls like HEX('FFFFFF') with string values
+            luaCode = luaCode.replace(/HEX\(['"]([0-9A-Fa-f]{6,8})['"]\)/g, '"$1"');
+        
+            // Replace single quotes with double quotes
+            luaCode = luaCode.replace(/'/g, '"');
+        
+            // Initialize variables
+            let index = 0;
+            const length = luaCode.length;
+        
+            // Function to parse the Lua table
+            function parseValue() {
+                skipWhitespace();
+                if (luaCode[index] === '{') {
+                    return parseTable();
+                } else if (luaCode[index] === '"') {
+                    return parseString();
+                } else if (/[a-zA-Z_]/.test(luaCode[index])) {
+                    return parseIdentifier();
+                } else {
+                    return parseLiteral();
                 }
             }
         
-            return parsedData;
+            function parseTable() {
+                let isArray = true;
+                const result = [];
+                index++; // Skip '{'
+                skipWhitespace();
+        
+                while (index < length && luaCode[index] !== '}') {
+                    skipWhitespace();
+        
+                    // Check for key-value pair
+                    let startIdx = index;
+                    let key = null;
+                    if (luaCode[index] === '"') {
+                        key = parseString();
+                    } else if (/[a-zA-Z_]/.test(luaCode[index])) {
+                        key = parseIdentifier();
+                    }
+        
+                    skipWhitespace();
+                    if (luaCode[index] === '=' || luaCode[index] === ':') {
+                        // This is a key-value pair
+                        isArray = false;
+                        index++; // Skip '=' or ':'
+                        skipWhitespace();
+                        const value = parseValue();
+                        result.push({ key, value });
+                    } else if (key !== null) {
+                        // Not a key-value pair, reset index and treat as value
+                        index = startIdx;
+                        const value = parseValue();
+                        result.push(value);
+                    } else {
+                        // Parse value directly
+                        const value = parseValue();
+                        result.push(value);
+                    }
+        
+                    skipWhitespace();
+                    if (luaCode[index] === ',') {
+                        index++; // Skip ','
+                        skipWhitespace();
+                    } else {
+                        break;
+                    }
+                }
+        
+                if (luaCode[index] === '}') {
+                    index++; // Skip '}'
+                    if (isArray) {
+                        return result;
+                    } else {
+                        const obj = {};
+                        result.forEach(item => {
+                            if (item.key !== undefined) {
+                                obj[item.key] = item.value;
+                            } else {
+                                throw new Error('Invalid table structure');
+                            }
+                        });
+                        return obj;
+                    }
+                } else {
+                    throw new Error(`Expected '}' at position ${index}`);
+                }
+            }
+        
+            function parseIdentifier() {
+                let id = '';
+                while (index < length && /[a-zA-Z0-9_]/.test(luaCode[index])) {
+                    id += luaCode[index++];
+                }
+                return id;
+            }
+        
+            function parseString() {
+                let str = '';
+                index++; // Skip opening '"'
+                while (index < length && luaCode[index] !== '"') {
+                    str += luaCode[index++];
+                }
+                if (luaCode[index] === '"') {
+                    index++; // Skip closing '"'
+                    return str;
+                } else {
+                    throw new Error(`Unterminated string at position ${index}`);
+                }
+            }
+        
+            function parseLiteral() {
+                let literal = '';
+                while (index < length && /[\w\d]/.test(luaCode[index])) {
+                    literal += luaCode[index++];
+                }
+                return literal;
+            }
+        
+            function skipWhitespace() {
+                while (index < length && /\s/.test(luaCode[index])) {
+                    index++;
+                }
+            }
+        
+            // Start parsing
+            try {
+                const parsedValue = parseValue();
+                // Now, we have a JavaScript object representing the Lua table
+                let flattened = {};
+                flattenObject(parsedValue, '', flattened);
+                return flattened;
+            } catch (e) {
+                console.error('Error parsing Lua code:', e);
+                alert(`Failed to parse Lua code: ${e.message}`);
+                return null;
+            }
+        }
+        
+        // Helper function to flatten the object
+        function flattenObject(obj, parentKey, result) {
+            if (Array.isArray(obj)) {
+                obj.forEach((item, index) => {
+                    const newKey = parentKey ? `${parentKey}[${index}]` : `[${index}]`;
+                    if (typeof item === 'object' && item !== null) {
+                        flattenObject(item, newKey, result);
+                    } else {
+                        result[newKey] = item;
+                    }
+                });
+            } else if (typeof obj === 'object' && obj !== null) {
+                for (let key in obj) {
+                    const newKey = parentKey ? `${parentKey}.${key}` : key;
+                    if (typeof obj[key] === 'object' && obj[key] !== null) {
+                        flattenObject(obj[key], newKey, result);
+                    } else {
+                        result[newKey] = obj[key];
+                    }
+                }
+            }
+        }
+        
+        // Function to convert Lua arrays to JSON arrays
+        function convertLuaArrays(luaCode) {
+            // This function finds tables without keys and converts them to JSON arrays
+        
+            // Regex pattern to find tables without keys
+            const arrayPattern = /{([\s\S]*?)}/g;
+        
+            return luaCode.replace(arrayPattern, function(match, content) {
+                // Check if the content contains any colons, indicating key-value pairs
+                if (/:\s*/.test(content)) {
+                    // Contains key-value pairs, keep as object
+                    return '{' + content + '}';
+                } else {
+                    // No key-value pairs, convert to array
+                    return '[' + content + ']';
+                }
+            });
+        }
+        
+        function parseTable(tableNode) {
+            const table = {};
+        
+            tableNode.fields.forEach(field => {
+                if (field.type === 'TableKey' || field.type === 'TableKeyString') {
+                    const key = parseExpression(field.key);
+                    const value = parseExpression(field.value);
+                    table[key] = value;
+                } else if (field.type === 'TableValue') {
+                    // Handle array entries
+                    const value = parseExpression(field.value);
+                    if (!Array.isArray(table.array)) {
+                        table.array = [];
+                    }
+                    table.array.push(value);
+                }
+            });
+        
+            return table;
+        }
+        
+        function parseExpression(node) {
+            switch (node.type) {
+                case 'StringLiteral':
+                    return node.value;
+                case 'NumericLiteral':
+                    return node.value;
+                case 'BooleanLiteral':
+                    return node.value;
+                case 'TableConstructorExpression':
+                    return parseTable(node);
+                case 'CallExpression':
+                    return parseFunctionCall(node);
+                case 'Identifier':
+                    return node.name;
+                default:
+                    return null;
+            }
+        }
+        
+        function parseFunctionCall(node) {
+            // Assuming function calls are like HEX('FFFFFF')
+            if (node.base.type === 'Identifier' && node.base.name === 'HEX') {
+                const arg = node.arguments[0];
+                if (arg.type === 'StringLiteral') {
+                    return arg.value.toUpperCase();
+                }
+            }
+            return null;
         }
         
         // Add the scroll event listener to show/hide the "Top" button
@@ -1200,10 +1439,20 @@
         // Function to lookup color by key
         function lookupColorByKey(keyPath, useDefault = false) {
             let dataArray = useDefault ? defaultColorData : colorData;
-            let keys = parseKeyPath(keyPath);
-            if (!keys) return null;
-            let result = findColorByKeyPath(dataArray, keys);
-            return result ? result.toUpperCase() : null;
+            let flattenedData = {};
+            flattenObject({ data: dataArray }, '', flattenedData);
+        
+            // Remove the 'data.' prefix
+            let cleanedData = {};
+            for (let key in flattenedData) {
+                cleanedData[key.replace(/^data\./, '')] = flattenedData[key];
+            }
+        
+            if (cleanedData.hasOwnProperty(keyPath)) {
+                return cleanedData[keyPath];
+            } else {
+                return null;
+            }
         }
         
         // Recursive function to find color in data array
