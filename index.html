@@ -1349,6 +1349,46 @@
             }
         }
         
+        function flattenColorData(dataArray, parentKey = '', result = {}) {
+            dataArray.forEach(item => {
+                let currentKey = parentKey ? `${parentKey}.${item.key}` : item.key;
+        
+                if (Array.isArray(item.value)) {
+                    // Check if the array is of objects with 'key' and 'value'
+                    if (item.value.length > 0 && typeof item.value[0] === 'object' && item.value[0].hasOwnProperty('key')) {
+                        // Array of objects with 'key' and 'value'
+                        item.value.forEach(subItem => {
+                            flattenColorData([subItem], currentKey, result);
+                        });
+                    } else if (item.value.length > 0 && typeof item.value[0] === 'object' && item.value[0].hasOwnProperty('value')) {
+                        // Array of objects with 'value' (no 'key')
+                        item.value.forEach((subItem, index) => {
+                            let subKey = `${currentKey}[${index}]`;
+                            if (typeof subItem.value === 'object') {
+                                flattenColorData([subItem], subKey, result);
+                            } else {
+                                result[subKey] = subItem.value;
+                            }
+                        });
+                    } else {
+                        // Array of primitive values
+                        item.value.forEach((subValue, index) => {
+                            let subKey = `${currentKey}[${index}]`;
+                            result[subKey] = subValue;
+                        });
+                    }
+                } else if (typeof item.value === 'object' && item.value !== null) {
+                    // Value is an object
+                    flattenColorData([item.value], currentKey, result);
+                } else {
+                    // Value is a string or primitive
+                    result[currentKey] = item.value;
+                }
+            });
+        
+            return result;
+        }
+        
         // Function to convert Lua arrays to JSON arrays
         function convertLuaArrays(luaCode) {
             // This function finds tables without keys and converts them to JSON arrays
@@ -1439,17 +1479,10 @@
         // Function to lookup color by key
         function lookupColorByKey(keyPath, useDefault = false) {
             let dataArray = useDefault ? defaultColorData : colorData;
-            let flattenedData = {};
-            flattenObject({ data: dataArray }, '', flattenedData);
+            let flattenedData = flattenColorData(dataArray);
         
-            // Remove the 'data.' prefix
-            let cleanedData = {};
-            for (let key in flattenedData) {
-                cleanedData[key.replace(/^data\./, '')] = flattenedData[key];
-            }
-        
-            if (cleanedData.hasOwnProperty(keyPath)) {
-                return cleanedData[keyPath];
+            if (flattenedData.hasOwnProperty(keyPath)) {
+                return flattenedData[keyPath];
             } else {
                 return null;
             }
