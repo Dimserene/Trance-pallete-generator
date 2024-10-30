@@ -2,124 +2,123 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Trance Palette Generator</title> <!-- Default title -->
+    <title></title> <!-- Default title -->
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Open+Sans&family=Lato&family=Montserrat&family=Oswald&family=Raleway&family=Merriweather&family=Playfair+Display&family=Abril+Fatface&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Include Spectrum CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css">
     <script>
-        // Array of possible titles
-        const titles = [
-            "Trance Palette Generator",
-            "Trance Theme Maker",
-            "Trance Palette Creator",
-            "Trance Color Designer",
-            "Trance Theme Builder",
-            "Trance Shade Generator",
-            "Trance Palette Wizard",
-            "Trance Theme Customizer",
-            "Trance Style Generator",
-            "Trance Color Schemer",
-            "Trance Theme Designer",
-            "Trance Shade Builder",
-            "Trance Palette Tool",
-            "Trance Hue Designer",
-            "Trance Color Toolkit",
-            "Trance Style Creator",
-            "Trance Theme Wizard",
-            "Trance Tint Generator",
-            "Trance Shade Customizer",
-            "Trance Palette Mixer",
-            "Trance Theme Artist",
-            "Trance Color Maker",
-            "Trance Design Studio",
-            "Trance Theme Lab",
-            "Trance Hue Creator",
-            "Trance Palette Studio",
-            "Trance Style Maker",
-            "Trance Theme Painter",
-            "Trance Shade Artist",
-            "Trance Color Blender",
-            "Trance Hue Generator",
-            "Trance Theme Composer",
-            "Trance Palette Designer",
-            "Trance Tint Maker",
-            "Trance Color Editor",
-            "Trance Style Builder",
-            "Trance Theme Schemer",
-            "Trance Shade Designer",
-            "Trance Palette Builder",
-            "Trance Color Crafter",
-            "Trance Theme Crafter",
-            "Trance Hue Maker",
-            "Trance Style Editor",
-            "Trance Palette Crafter",
-            "Trance Shade Schemer",
-            "Trance Theme Toolkit",
-            "Trance Color Wizard",
-            "Trance Palette Editor",
-            "Trance Design Creator",
-            "Trance Style Wizard",
-            "Trance Tint Designer",
-            "Trance Theme Blender",
-            "Trance Hue Wizard",
-            "Trance Shade Mixer",
-            "Trance Color Artist",
-            "Trance Theme Editor",
-            "Trance Palette Crafter",
-            "Trance Shade Maker",
-            "Trance Hue Builder",
-            "Trance Color Creator",
-            "Trance Style Schemer",
-            "Trance Theme Mixer",
-            "Trance Tint Crafter",
-            "Trance Color Builder",
-            "Trance Design Generator",
-            "Trance Style Studio",
-            "Trance Hue Editor",
-            "Trance Color Schemer",
-            "Trance Palette Mixer",
-            "Trance Theme Creator",
-            "Trance Hue Artist",
-            "Trance Tint Builder",
-            "Trance Style Composer",
-            "Trance Theme Composer",
-            "Trance Shade Editor",
-            "Trance Palette Crafter",
-            "Trance Tint Creator",
-            "Trance Style Mixer",
-            "Trance Hue Crafter",
-            "Trance Palette Wizard",
-            "Trance Color Composer",
-            "Trance Theme Creator",
-            "Trance Shade Builder",
-            "Trance Tint Wizard",
-            "Trance Design Studio",
-            "Trance Color Mixer",
-            "Trance Style Painter",
-            "Trance Theme Tool",
-            "Trance Hue Mixer",
-            "Trance Palette Tool",
-            "Trance Tint Maker",
-            "Trance Color Painter",
-            "Trance Shade Wizard",
-            "Trance Style Tool",
-            "Trance Design Builder",
-            "Trance Theme Crafter",
-            "Trance Hue Designer",
-            "Trance Tint Schemer",
-            "Trance Shade Creator",
-            "Trance Color Builder"
-        ];
-
-        // Function to randomly select a title
-        function setRandomTitle() {
-            const randomTitle = titles[Math.floor(Math.random() * titles.length)];
-            document.title = randomTitle; // Set the page title
-            document.getElementById("pageTitle").innerText = randomTitle; // Set the h1 title
+    // Arrays of color-related and palette terms
+    const terms = [
+        // Color-related and palette terms
+        'Color', 'Hue', 'Tint', 'Shade', 'Tone', 'Glow', 'Prism', 'Dye',
+        'Spectrum', 'Gradient', 'Chroma', 'Blend', 'Mix', 'Pigment', 'Swatch',
+        'Palette', 'Canvas', 'Brush', 'Stencil', 'Ink', 'Spray', 'Pastel',
+        'Contrast', 'Saturation', 'Brightness', 'Vibrance', 'Luminance', 'Opacity',
+        'Filter', 'Pixel', 'Splash', 'Stroke', 'Pattern', 'Texture'
+    ];
+    
+    const creatorTerms = [
+        'Maker', 'Artist', 'Wizard', 'Tool', 'Lab', 'Studio', 'Crafter',
+        'Builder', 'Mixer', 'Editor', 'Painter', 'Master', 'Smith',
+        'Guru', 'Sage', 'Pro', 'Ace', 'Chief', 'Maestro', 'Conjurer',
+        'Visionary', 'Alchemist', 'Engineer', 'Creator', 'Designer'
+    ];
+    
+    // Array of font families
+    const fontFamilies = [
+        'Arial, sans-serif',
+        'Helvetica, sans-serif',
+        'Georgia, serif',
+        '"Times New Roman", Times, serif',
+        '"Courier New", Courier, monospace',
+        'Verdana, sans-serif',
+        '"Lucida Console", Monaco, monospace',
+        '"Palatino Linotype", "Book Antiqua", Palatino, serif',
+        '"Comic Sans MS", cursive, sans-serif',
+        '"Trebuchet MS", Helvetica, sans-serif',
+        '"Brush Script MT", cursive',
+        '"Roboto", sans-serif',
+        '"Open Sans", sans-serif',
+        '"Lato", sans-serif',
+        '"Montserrat", sans-serif',
+        '"Oswald", sans-serif',
+        '"Raleway", sans-serif',
+        '"Merriweather", serif',
+        '"Playfair Display", serif',
+        '"Abril Fatface", cursive'
+    ];
+    
+    // Maximum title length
+    const maxTitleLength = 25; // Adjust as needed for mobile devices
+    
+    // Function to generate a random title within the length limit
+    function generateRandomTitle() {
+        let randomTitle = '';
+        let attempts = 0;
+        const maxAttempts = 10; // Prevent infinite loops
+    
+        do {
+            const randomTerm = terms[Math.floor(Math.random() * terms.length)];
+            const randomCreatorTerm = creatorTerms[Math.floor(Math.random() * creatorTerms.length)];
+            randomTitle = 'Trance ' + randomTerm + ' ' + randomCreatorTerm;
+            attempts++;
+        } while (randomTitle.length > maxTitleLength && attempts < maxAttempts);
+    
+        // If unable to generate a short enough title, truncate it
+        if (randomTitle.length > maxTitleLength) {
+            randomTitle = randomTitle.substring(0, maxTitleLength - 1) + '…'; // Add ellipsis
         }
-
-        // Run the function on page load
-        window.onload = setRandomTitle;
+    
+        return randomTitle;
+    }
+    
+    // Typewriter and rainbow effect variables
+    let typewriterText = '';
+    let typewriterIndex = 0;
+    let typingSpeed = 100; // Milliseconds per character
+    
+    function typeWriter() {
+        if (typewriterIndex < typewriterText.length) {
+            let char = typewriterText.charAt(typewriterIndex);
+    
+            // Calculate the hue for this character (0 to 360 degrees)
+            let hue = (typewriterIndex / typewriterText.length) * 360;
+            // Use brighter colors by increasing lightness
+            let color = `hsl(${hue}, 100%, 90%)`;
+    
+            // Append the character with a span and color
+            document.getElementById("pageTitle").innerHTML += `<span style="color:${color}">${char}</span>`;
+    
+            typewriterIndex++;
+            setTimeout(typeWriter, typingSpeed);
+        } else {
+            // Remove HTML tags to set the page title
+            let plainTextTitle = typewriterText;
+            document.title = plainTextTitle;
+        }
+    }
+    
+    // Function to set the random title with typewriter, smooth rainbow effect, and random font
+    function setRandomTitle() {
+        // Generate the random title
+        typewriterText = generateRandomTitle();
+        typewriterIndex = 0;
+        document.getElementById("pageTitle").innerHTML = ''; // Clear existing text
+    
+        // Select a random font
+        const randomFont = fontFamilies[Math.floor(Math.random() * fontFamilies.length)];
+    
+        // Apply the random font to the pageTitle element
+        document.getElementById("pageTitle").style.fontFamily = randomFont;
+    
+        // Start the typewriter effect
+        typeWriter();
+    }
+    
+    // Run the function on page load
+    window.onload = setRandomTitle;
     </script>
     <style>
         /* Base CSS Styles */
@@ -372,12 +371,30 @@
                 margin-top: 5px;
                 padding: 5px 5px;
             }
+            #pageTitle::after {
+                content: '';
+                display: inline-block;
+                width: 3px;
+                height: 26px;
+                background-color: white;
+                margin-left: 2px;
+                animation: blink 1s steps(1) infinite;
+                vertical-align: center;
+            }
+            
+            @keyframes blink {
+                0%, 50% { opacity: 1; }
+                50.01%, 100% { opacity: 0; }
+            }
+            #pageTitle span {
+                transition: color 0.5s;
+            }
         }
     </style>
 </head>
 <body>
 
-    <h1 id="pageTitle">Trance Palette Generator</h1> <!-- Default title for heading -->
+    <h1 id="pageTitle"></h1> <!-- Default title for heading -->
 
     <div style="text-align: center;">
         <button id="resetAllButton">Reset All</button>
