@@ -976,20 +976,26 @@
         
             // Initialize Spectrum on colorInput
             const spectrumInstance = $(colorInput).spectrum({
-                color: '#' + hexColor + (alpha < 1 ? Math.round(alpha * 255).toString(16).padStart(2, '0') : ''),
+                color: `#${hexColor}${alpha < 1 ? Math.round(alpha * 255).toString(16).padStart(2, '0') : ''}`,
                 showInput: false,
                 showInitial: false,
                 preferredFormat: "hex8",
                 showAlpha: true,
                 move: function(tinycolor) {
-                    const newHex8 = tinycolor.toHex8String().toUpperCase();
-                    hexInput.value = newHex8.slice(1);
-                    updateParentData(newHex8.slice(1));
+                    const rgba = tinycolor.toRgb();
+                    const hex = tinycolor.toHexString().toUpperCase().slice(1); // Get the hex part
+                    const alphaHex = Math.round(rgba.a * 255).toString(16).toUpperCase().padStart(2, '0'); // Convert alpha to hex
+                    const formattedColor = `${hex}${alphaHex}`; // Append alpha to hex
+                    hexInput.value = formattedColor;
+                    updateParentData(formattedColor);
                 },
                 change: function(tinycolor) {
-                    const newHex8 = tinycolor.toHex8String().toUpperCase();
-                    hexInput.value = newHex8.slice(1);
-                    updateParentData(newHex8.slice(1));
+                    const rgba = tinycolor.toRgb();
+                    const hex = tinycolor.toHexString().toUpperCase().slice(1);
+                    const alphaHex = Math.round(rgba.a * 255).toString(16).toUpperCase().padStart(2, '0');
+                    const formattedColor = `${hex}${alphaHex}`;
+                    hexInput.value = formattedColor;
+                    updateParentData(formattedColor);
                 }
             });
         
