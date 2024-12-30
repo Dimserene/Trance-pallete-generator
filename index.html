@@ -750,91 +750,88 @@
         function createColorPickers(dataArray, container, defaultDataArray) {
             // Clear the container to prevent duplicates
             container.innerHTML = '';
-            
-            // Reset the spectrumInstances array
-            spectrumInstances = [];
-            
-            const mainCategory = { key: 'Main', items: [] };
-            const levelsCategory = { key: 'Levels and Rarity', items: [] };
-            const categories = [];
 
-            dataArray.forEach((item, index) => {
-                const key = item.key;
-                const value = item.value;
-                const comment = item.comment || '';
-                const defaultItem = defaultDataArray ? defaultDataArray[index] : null;
+            // Iterate through the defaultDataArray to maintain order
+            defaultDataArray.forEach((defaultItem, index) => {
+                const key = defaultItem.key;
+                const comment = defaultItem.comment || '';
+                const defaultValue = defaultItem.value;
 
-                if (key === 'RARITY' || key === 'HAND_LEVELS') {
-                    // Group RARITY and HAND_LEVELS under "Levels and Rarity"
-                    levelsCategory.items.push({
-                        key: key,
-                        value: value,
-                        comment: comment,
-                        dataArray: dataArray,
-                        dataIndex: index,
-                        defaultValue: defaultItem ? defaultItem.value : value
-                    });
-                } else if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object' && value[0].hasOwnProperty('value')) {
-                    // Nested category with array of objects
-                    categories.push({
-                        key: key,
-                        value: value,
-                        comment: comment,
-                        defaultValue: defaultItem ? defaultItem.value : []
-                    });
-                } else {
-                    // Unclassified color or array of colors
-                    mainCategory.items.push({
-                        key: key,
-                        value: value,
-                        comment: comment,
-                        dataArray: dataArray,
-                        dataIndex: index,
-                        defaultValue: defaultItem ? defaultItem.value : value
-                    });
+                // Find the corresponding item in the current data array
+                const currentItem = dataArray.find(item => item.key === key) || defaultItem;
+
+                // Create a category or single item
+                if (Array.isArray(currentItem.value) && currentItem.value.length > 0) {
+                    if (typeof currentItem.value[0] === 'object' && currentItem.value[0].hasOwnProperty('value')) {
+                        // Category with an array of objects
+                        const categoryDiv = document.createElement('div');
+                        categoryDiv.className = 'category';
+
+                        const categoryTitle = document.createElement('h2');
+                        categoryTitle.textContent = currentItem.key;
+                        categoryDiv.appendChild(categoryTitle);
+
+                        const colorGrid = document.createElement('div');
+                        colorGrid.className = 'color-grid';
+
+                        currentItem.value.forEach((subItem, subIndex) => {
+                            const subKey = subItem.key || `${currentItem.key}[${subIndex}]`;
+                            const subValue = subItem.value;
+                            const subComment = subItem.comment || '';
+                            const defaultSubValue = defaultValue[subIndex]?.value || 'FFFFFF';
+
+                            createColorItem(subValue, subKey, currentItem.value, subIndex, colorGrid, defaultSubValue, subComment);
+                        });
+
+                        categoryDiv.appendChild(colorGrid);
+                        container.appendChild(categoryDiv);
+                    } else {
+                        // Array of primitives (flat list of colors)
+                        const categoryDiv = document.createElement('div');
+                        categoryDiv.className = 'category';
+
+                        const categoryTitle = document.createElement('h2');
+                        categoryTitle.textContent = currentItem.key;
+                        categoryDiv.appendChild(categoryTitle);
+
+                        const colorGrid = document.createElement('div');
+                        colorGrid.className = 'color-grid';
+
+                        currentItem.value.forEach((color, subIndex) => {
+                            createColorItem(color, `${currentItem.key}[${subIndex}]`, currentItem.value, subIndex, colorGrid, defaultValue[subIndex] || 'FFFFFF', comment);
+                        });
+
+                        categoryDiv.appendChild(colorGrid);
+                        container.appendChild(categoryDiv);
+                    }
+                } else if (typeof currentItem.value === 'string') {
+                    // Single flat color value
+                    const mainSection = document.getElementById('mainSection') || document.createElement('div');
+                    mainSection.id = 'mainSection';
+                    mainSection.className = 'category';
+
+                    if (!mainSection.hasChildNodes()) {
+                        const categoryTitle = document.createElement('h2');
+                        categoryTitle.textContent = 'Main';
+                        mainSection.appendChild(categoryTitle);
+                    }
+
+                    const colorGrid = mainSection.querySelector('.color-grid') || document.createElement('div');
+                    colorGrid.className = 'color-grid';
+
+                    createColorItem(currentItem.value, currentItem.key, dataArray, index, colorGrid, defaultValue, comment);
+
+                    if (!mainSection.contains(colorGrid)) {
+                        mainSection.appendChild(colorGrid);
+                    }
+
+                    if (!container.contains(mainSection)) {
+                        container.appendChild(mainSection);
+                    }
                 }
             });
-
-            // Display Main category if it has items
-            if (mainCategory.items.length > 0) {
-                createCategoryDiv(mainCategory, container);
-            }
-
-            // Display Levels and Rarity category if it has items
-            if (levelsCategory.items.length > 0) {
-                createCategoryDiv(levelsCategory, container);
-            }
-
-            // Now process other categories
-            categories.forEach(category => {
-                const defaultSubData = category.defaultValue;
-
-                const categoryDiv = document.createElement('div');
-                categoryDiv.className = 'category';
-
-                const categoryTitle = document.createElement('h2');
-                categoryTitle.textContent = category.displayName || category.key;
-                categoryDiv.appendChild(categoryTitle);
-
-                const colorGrid = document.createElement('div');
-                colorGrid.className = 'color-grid';
-
-                category.value.forEach((subItem, subIndex) => {
-                    const subKey = subItem.key || `${category.key}[${subIndex}]`;
-                    const subValue = subItem.value;
-                    const subComment = subItem.comment || '';
-                    const defaultSubItem = defaultSubData ? defaultSubData[subIndex] : null;
-
-                    if (typeof subValue === 'string') {
-                        const defaultColorValue = defaultSubItem ? defaultSubItem.value || 'FFFFFF' : 'FFFFFF';
-                        createColorItem(subValue, subKey, category.value, subIndex, colorGrid, defaultColorValue, subComment);
-                    }
-                });
-
-                categoryDiv.appendChild(colorGrid);
-                container.appendChild(categoryDiv);
-            });
         }
+
 
         function createCategoryDiv(categoryObj, container) {
             const categoryDiv = document.createElement('div');
